@@ -1,0 +1,23 @@
+mode: Mainline
+tag-prefix: 'v'
+commit-message-incrementing: Enabled
+branches:
+  main:
+    regex: ^master$|^main$
+    tag: ''
+    increment: Patch
+    prevent-increment-of-merged-branch-version: true
+    track-merge-target: false
+    tracks-release-branches: false
+    is-release-branch: false
+  feature:
+    regex: ^features?[/-]
+    tag: useBranchName
+    increment: Inherit
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: false
+    tracks-release-branches: false
+    is-release-branch: false
+ignore:
+  sha: []
+merge-message-formats: {}
