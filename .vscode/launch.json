@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Demo",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/UniqueIdGenerator.Demo/bin/Debug/net8.0/UniqueIdGenerator.Demo.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/UniqueIdGenerator.Demo",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ]
+}
