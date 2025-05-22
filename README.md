@@ -372,3 +372,5 @@ The CI/CD pipeline will automatically:
 - Generate the NuGet package
 - Publish the package to NuGet.org (if building from a tag)
 
+For detailed publishing instructions, see [PUBLISHING.md](PUBLISHING.md).
+
