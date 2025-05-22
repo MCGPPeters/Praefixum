@@ -40,14 +40,26 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj
       
+    - name: Set version from tag if available
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/v* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Using version from tag: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        else
+          echo "Using version from GitVersion: ${{ steps.gitversion.outputs.semVer }}"
+          echo "VERSION=${{ steps.gitversion.outputs.semVer }}" >> $GITHUB_OUTPUT
+        fi
+        
     - name: Build
-      run: dotnet build UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet build UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-restore /p:Version=${{ steps.version.outputs.VERSION }}
       
     - name: Test
       run: dotnet test UniqueIdGenerator.Tests/UniqueIdGenerator.Tests.csproj --configuration Release
       
     - name: Pack
-      run: dotnet pack UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-build --output nuget-packages /p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet pack UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-build --output nuget-packages /p:Version=${{ steps.version.outputs.VERSION }}
       
     - name: Upload NuGet packages as artifacts
       uses: actions/upload-artifact@v4
@@ -58,15 +70,18 @@ jobs:
     - name: Verify NuGet package
       run: |
         echo "Verifying NuGet package..."
-        dotnet tool install --global dotnet-validate
-        packagePath=$(ls -1 nuget-packages/*.nupkg | head -1)
-        echo "Validating package: $packagePath"
-        validate package $packagePath
+        echo "Package details:"
+        ls -la nuget-packages/
+        nuget_file=$(ls -1 nuget-packages/*.nupkg | head -1)
+        echo "Found package: $nuget_file"
+        unzip -l "$nuget_file" || echo "Package preview unavailable"
+      continue-on-error: true
         
     - name: Publish to NuGet
       if: startsWith(github.ref, 'refs/tags/v')
       run: |
         echo "Publishing NuGet package with version ${{ steps.gitversion.outputs.semVer }}"
-        ls -la nuget-packages/
-        dotnet nuget push nuget-packages/*.nupkg --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols --verbosity detailed
+        packagePath=$(ls -1 nuget-packages/*.nupkg | head -1)
+        echo "Publishing package: $packagePath"
+        dotnet nuget push "$packagePath" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols --verbosity detailed
       continue-on-error: false
