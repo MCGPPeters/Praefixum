@@ -5,6 +5,15 @@ All notable changes to the UniqueIdGenerator project will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-05-22
+
+### Fixed
+- Fixed nullability warnings in source generator
+- Improved NuGet package configuration
+- Added proper symbol dictionary comparers for Roslyn compiler APIs
+- Added PUBLISHING.md with detailed instructions for GitHub and NuGet deployment
+- Added CHANGELOG.md and CHECKLIST.md for better release management
+
 ## [1.0.0] - 2025-05-22
 
 ### Added
@@ -20,6 +29,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MIT license
 - CI/CD pipeline with GitHub Actions
 - Unit tests for all ID generation formats
-
-### Fixed
-- NuGet packaging configuration to properly include the analyzer DLL
