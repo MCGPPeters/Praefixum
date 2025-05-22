@@ -8,25 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-05-22
 
 ### Added
-- Initial release of UniqueIdGenerator
-- Source generator for creating compile-time unique IDs
+- Initial release of UniqueIdGenerator source generator
 - Support for multiple ID formats:
   - Hex8 (8-character hexadecimal)
-  - Hex16 (16-character hexadecimal)
+  - Hex16 (16-character hexadecimal, default)
   - Hex32 (32-character hexadecimal)
-  - GUID (standard GUID format)
+  - GUID (standard GUID format with dashes)
   - HtmlId (4-character HTML-friendly ID)
-- Comprehensive test suite
-- Demo project with usage examples
-- Complete documentation in README.md
+- Deterministic ID generation based on code location
+- Extensive documentation in README.md
+- MIT license
+- CI/CD pipeline with GitHub Actions
+- Unit tests for all ID generation formats
 
 ### Fixed
-- NuGet packaging configuration
-- Project structure for proper analyzer packaging
-
-## [0.1.0] - 2025-05-21
-
-### Added
-- Initial development version
-- Basic source generator implementation
-- Hex16 format support
+- NuGet packaging configuration to properly include the analyzer DLL
