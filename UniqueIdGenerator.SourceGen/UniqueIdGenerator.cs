@@ -110,12 +110,15 @@ namespace UniqueIdGenerator
                     return;
 
                 // Process each parameter to find those with the UniqueIdAttribute
-                var uniqueParams = new Dictionary<IMethodSymbol, Dictionary<string, string>>();
-                var typeToParams = new Dictionary<INamedTypeSymbol, Dictionary<IMethodSymbol, Dictionary<string, string>>>();
+                var uniqueParams = new Dictionary<IMethodSymbol, Dictionary<string, string>>(SymbolEqualityComparer.Default);
+                var typeToParams = new Dictionary<INamedTypeSymbol, Dictionary<IMethodSymbol, Dictionary<string, string>>>(SymbolEqualityComparer.Default);
 
                 foreach (var parameter in parameters)
                 {
+                    if (parameter.SyntaxTree == null) continue;
                     var model = compilation.GetSemanticModel(parameter.SyntaxTree);
+                    if (model == null) continue;
+                    
                     var paramSymbol = model.GetDeclaredSymbol(parameter) as IParameterSymbol;
                     if (paramSymbol == null) continue;
 
@@ -155,7 +158,7 @@ namespace UniqueIdGenerator
                     // Store the unique ID for this parameter
                     if (!typeToParams.TryGetValue(typeSymbol, out var methodParams))
                     {
-                        methodParams = new Dictionary<IMethodSymbol, Dictionary<string, string>>();
+                        methodParams = new Dictionary<IMethodSymbol, Dictionary<string, string>>(SymbolEqualityComparer.Default);
                         typeToParams[typeSymbol] = methodParams;
                     }
 
