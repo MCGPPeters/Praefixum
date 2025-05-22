@@ -1,32 +1,34 @@
-<Project Sdk="Microsoft.NET.Sdk">  <PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <!-- Disable nullable warnings -->
-    <NoWarn>CS8602</NoWarn>
   </PropertyGroup>
+
   <!-- NuGet package references -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" PrivateAssets="all" />
   </ItemGroup>
+
   <!-- NuGet package configuration -->
-  <PropertyGroup>    <PackageId>UniqueIdGenerator</PackageId>
-    <!-- Version will be set by GitVersion in CI pipeline -->
-    <Authors>MCGPPeters</Authors>
+  <PropertyGroup>
+    <PackageId>UniqueIdGenerator</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>Your Name</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/MCGPPeters/UniqueIdGenerator</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/yourusername/UniqueIdGenerator</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/MCGPPeters/UniqueIdGenerator</RepositoryUrl>
+    <RepositoryUrl>https://github.com/yourusername/UniqueIdGenerator</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>A C# source generator that creates compile-time unique IDs for your methods with various format options.</Description>
-    <PackageReleaseNotes>Fixed nullability warnings and improved NuGet package.</PackageReleaseNotes>
+    <PackageReleaseNotes>Initial release with support for Hex8, Hex16, Hex32, GUID, and HTML ID formats.</PackageReleaseNotes>
     <Copyright>Copyright © 2025</Copyright>
     <PackageTags>source-generator;roslyn;unique-id;guid;identifier</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
