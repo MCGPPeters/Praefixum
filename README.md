@@ -3,7 +3,7 @@
 
 > **Name origin & pronunciation**
 
-**Praefixum** (pronounced: "PRAY-fix-um") is derived from the Latin word for "prefix". The name reflects the library's purpose: generating unique, deterministic IDs that can be used as prefixes or identifiers in your code, markup, or data. The name is unique, memorable, and avoids conflicts with existing packages on NuGet.org.
+**Praefixum** (pronounced: "PRAY-fix-um") is derived from the Latin word for "prefix". The name reflects the library's purpose: generating unique, deterministic IDs that can be used as prefixes or identifiers in your code, markup, or data.
 
 [![NuGet](https://img.shields.io/nuget/v/Praefixum.svg)](https://www.nuget.org/packages/Praefixum)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
