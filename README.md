@@ -1,7 +1,13 @@
+
 # Praefixum
+
+> **Name origin & pronunciation**
+
+**Praefixum** (pronounced: "PRAY-fix-um") is derived from the Latin word for "prefix". The name reflects the library's purpose: generating unique, deterministic IDs that can be used as prefixes or identifiers in your code, markup, or data. The name is unique, memorable, and avoids conflicts with existing packages on NuGet.org.
 
 [![NuGet](https://img.shields.io/nuget/v/Praefixum.svg)](https://www.nuget.org/packages/Praefixum)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 A C# source generator that creates deterministic, compile-time unique IDs for your methods with various format options. No runtime overhead, no external dependencies!
 
@@ -47,6 +53,7 @@ Add a reference to the `Praefixum.SourceGen` project:
 ```
 
 ## Basic Usage
+
 
 1. Add the Praefixum namespace:
 
@@ -195,7 +202,7 @@ For HTML element IDs, the generator uses a specialized algorithm to create compa
 Basic usage is simple:
 
 ```csharp
-using UniqueIdGenerator;
+using Praefixum;
 
 public partial class MyClass
 {
@@ -317,12 +324,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contributing
 
-We welcome contributions to the UniqueIdGenerator project! Here's how you can help:
+We welcome contributions to the Praefixum project! Here's how you can help:
 
 ### Development Workflow
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/yourusername/UniqueIdGenerator.git`
+2. Clone your fork: `git clone https://github.com/yourusername/Praefixum.git`
 3. Create a feature branch: `git checkout -b feature/your-feature-name`
 4. Make your changes
 5. Run tests: `dotnet test`
@@ -351,7 +358,7 @@ dotnet build
 To generate the NuGet package locally:
 
 ```bash
-dotnet pack UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj -c Release
+dotnet pack Praefixum.SourceGen/Praefixum.SourceGen.csproj -c Release
 ```
 
 ### Versioning
