@@ -16,13 +16,14 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
   </ItemGroup>
   <!-- NuGet package configuration -->
-  <PropertyGroup>    <PackageId>UniqueIdGenerator</PackageId>
+  <PropertyGroup>    
+    <PackageId>Praefixum</PackageId>
     <!-- Version will be set by GitVersion in CI pipeline -->
     <Authors>MCGPPeters</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/MCGPPeters/UniqueIdGenerator</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/MCGPPeters/Praefixum</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/MCGPPeters/UniqueIdGenerator</RepositoryUrl>
+    <RepositoryUrl>https://github.com/MCGPPeters/Praefixum</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>A C# source generator that creates compile-time unique IDs for your methods with various format options.</Description>

@@ -7,7 +7,7 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace UniqueIdGenerator.Tests
+namespace Praefixum.Tests
 {
     /// <summary>
     /// Helper class for testing Roslyn source generators

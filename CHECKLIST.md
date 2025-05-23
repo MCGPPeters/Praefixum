@@ -1,6 +1,6 @@
 # Release Checklist
 
-Use this checklist when preparing a new release of the UniqueIdGenerator.
+Use this checklist when preparing a new release of the Praefixum.
 
 ## Before Release
 
