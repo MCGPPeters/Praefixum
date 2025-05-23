@@ -38,8 +38,7 @@ namespace UniqueIdGenerator
         /// 32-character hexadecimal string (full MD5 hash)
         /// </summary>
         Hex32 = 1,
-        
-        /// <summary>
+          /// <summary>
         /// Standard GUID format with dashes
         /// </summary>
         Guid = 2,
@@ -48,10 +47,10 @@ namespace UniqueIdGenerator
         /// 8-character hexadecimal string (short format)
         /// </summary>
         Hex8 = 3,
-        
-        /// <summary>
-        /// Compact format optimized for HTML element IDs: 
-        /// 6-character alphanumeric string (lowercase a-z, 0-9)
+          /// <summary>
+        /// Compact format optimized for HTML5 element IDs: 
+        /// 6-character string that starts with a letter, followed by lowercase a-z, 0-9, hyphens (""-""), or underscores (""_"")
+        /// Fully compliant with HTML5 ID specifications
         /// </summary>
         HtmlId = 4
     }
@@ -236,27 +235,28 @@ namespace UniqueIdGenerator
                         
                     case UniqueIdFormat.Guid:
                         return new Guid(hashBytes).ToString("D");
-                        
-                    case UniqueIdFormat.Hex8:
+                          case UniqueIdFormat.Hex8:
                         return BitConverter.ToString(hashBytes, 0, 4).Replace("-", "").ToLowerInvariant();
-                    
+                        
                     case UniqueIdFormat.HtmlId:
-                        // Generate a compact HTML-friendly ID (now 4 chars by default, alphanumeric lowercase)
-                        return ConvertToHtmlId(hashBytes, 4);
+                        // Generate a HTML5-compliant ID (6 chars, starts with letter, alphanumeric with hyphens/underscores)
+                        return ConvertToHtmlId(hashBytes, 6);
                         
                     case UniqueIdFormat.Hex16:
                     default:
-                        return BitConverter.ToString(hashBytes, 0, 8).Replace("-", "").ToLowerInvariant();
-                }
+                        return BitConverter.ToString(hashBytes, 0, 8).Replace("-", "").ToLowerInvariant();                }
             }
         }
         
-        // Converts bytes to a HTML-friendly ID format (alphanumeric, lowercase)
-        private static string ConvertToHtmlId(byte[] bytes, int length = 4)
+        // Converts bytes to a HTML5-friendly ID format (alphanumeric, starting with a letter, includes hyphens and underscores)
+        private static string ConvertToHtmlId(byte[] bytes, int length = 6)
         {
-            // Use a more efficient encoding to maximize uniqueness in just 4 characters
-            // Use base36 encoding (a-z and 0-9) for HTML-safe IDs
-            const string validChars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            // HTML5 IDs must begin with a letter and can contain letters, digits, hyphens, underscores, and periods
+            // For better compatibility across older browsers, we'll use:
+            // - First character: a-z (letter)
+            // - Other characters: a-z, 0-9, hyphen (-), underscore (_)
+            
+            const string validChars = "abcdefghijklmnopqrstuvwxyz0123456789-_";
             
             // Ensure ID starts with a letter (HTML ID requirement)
             const string validStartChars = "abcdefghijklmnopqrstuvwxyz";
@@ -267,23 +267,18 @@ namespace UniqueIdGenerator
             byte firstByte = bytes[0];
             result.Append(validStartChars[firstByte % validStartChars.Length]);
             
-            // Use a more sophisticated algorithm to pack more uniqueness into 3 more characters
-            // by using larger bit ranges from the MD5 hash
+            // Use a more sophisticated algorithm to pack more uniqueness into remaining characters
             for (int i = 0; i < length - 1 && i < Math.Min(bytes.Length - 1, 6); i++)
             {
-                // Combine parts of multiple bytes to get better distribution
-                int value = 0;
-                
-                // Each character will use 6 bits (2^6 = 64 possibilities, which covers our 36 chars)
+                // Each character will use 6 bits (2^6 = 64 possibilities, which covers our 38 chars)
                 // Extract 6 bits starting from different offsets in the MD5 hash
                 int byteOffset = 1 + i * 2; // Skip first byte (used for first char) and use wider distribution
                 if (byteOffset < bytes.Length)
                 {
-                    value = (bytes[byteOffset] & 0x3F); // Take lower 6 bits
+                    int value = (bytes[byteOffset] & 0x3F); // Take lower 6 bits
+                    // Use the value to index into our character set
+                    result.Append(validChars[value % validChars.Length]);
                 }
-                
-                // Use the value to index into our character set
-                result.Append(validChars[value % validChars.Length]);
             }
             
             return result.ToString();

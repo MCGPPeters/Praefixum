@@ -21,17 +21,15 @@ namespace UniqueIdGenerator
         /// Standard GUID format with dashes
         /// </summary>
         Guid = 2,
-        
-        /// <summary>
+          /// <summary>
         /// 8-character hexadecimal string (short format)
         /// </summary>
         Hex8 = 3,
         
         /// <summary>
-        /// Compact format optimized for HTML element IDs: 
-        /// 4-character alphanumeric string (lowercase a-z, 0-9)
-        /// Always starts with a letter (HTML ID requirement)
-        /// Uses an optimized algorithm to maximize uniqueness in just 4 characters
+        /// Compact format optimized for HTML5 element IDs: 
+        /// 6-character string that starts with a letter, followed by lowercase a-z, 0-9, hyphens (-), or underscores (_)
+        /// Fully compliant with HTML5 ID specifications
         /// </summary>
         HtmlId = 4
     }

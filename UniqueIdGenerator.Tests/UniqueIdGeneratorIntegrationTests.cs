@@ -209,21 +209,22 @@ namespace HtmlIdTest
             Assert.NotNull(generatedSource);
             
             var generatedCode = generatedSource.Source;
-            
-            // Extract all HTML IDs
-            var matches = Regex.Matches(generatedCode, @"public const string GetHtmlId\d+_id_Id = ""([a-zA-Z0-9\-_:\.]+)"";");
+              // Extract all HTML IDs
+            var matches = Regex.Matches(generatedCode, @"public const string GetHtmlId\d+_id_Id = ""([a-zA-Z0-9\-_]+)"";");
             Assert.Equal(50, matches.Count);
             
             // Verify each ID complies with HTML spec
             foreach (Match match in matches)
             {
                 var id = match.Groups[1].Value;
-                
-                // 1. First character must be a letter (HTML requirement)
+                  // 1. First character must be a letter (HTML requirement)
                 Assert.True(char.IsLetter(id[0]));
                 
-                // 2. All characters must be valid HTML ID characters
-                Assert.Matches("^[a-zA-Z][a-zA-Z0-9\\-_:]*$", id);
+                // 2. Length should be exactly 6 characters
+                Assert.Equal(6, id.Length);
+                
+                // 3. All characters must be valid HTML ID characters (a-z, 0-9, hyphens, underscores)
+                Assert.Matches("^[a-zA-Z][a-zA-Z0-9\\-_]*$", id);
             }
             
             // Check uniqueness
