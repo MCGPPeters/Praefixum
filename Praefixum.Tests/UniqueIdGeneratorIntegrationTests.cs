@@ -126,8 +126,8 @@ namespace StaticTest
             Assert.NotNull(staticClassSource);
             Assert.NotNull(nonStaticClassSource);
             
-            // Static class should be declared as static
-            Assert.Contains("static class StaticClass", staticClassSource.Source);
+            // Static class should be declared as static partial
+            Assert.Contains("static partial class StaticClass", staticClassSource.Source);
             Assert.Contains("public const string GetId_id_Id", staticClassSource.Source);
             
             // Non-static class should not be declared as static
