@@ -38,16 +38,16 @@ jobs:
         echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
         
     - name: Restore dependencies
-      run: dotnet restore UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj
+      run: dotnet restore Praefixum.SourceGen/Praefixum.SourceGen.csproj
       
     - name: Build
-      run: dotnet build UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet build Praefixum.SourceGen/Praefixum.SourceGen.csproj --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
       
     - name: Test
-      run: dotnet test UniqueIdGenerator.Tests/UniqueIdGenerator.Tests.csproj --configuration Release
+      run: dotnet test Praefixum.Tests/Praefixum.Tests.csproj --configuration Release
       
     - name: Pack
-      run: dotnet pack UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-build --output nuget-packages /p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet pack Praefixum.SourceGen/Praefixum.SourceGen.csproj --configuration Release --no-build --output nuget-packages /p:Version=${{ steps.gitversion.outputs.semVer }}
       
     - name: Upload NuGet packages as artifacts
       uses: actions/upload-artifact@v4
