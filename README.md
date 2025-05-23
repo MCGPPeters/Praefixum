@@ -95,7 +95,7 @@ public string GetShortId([UniqueId(UniqueIdFormat.Hex8)] string id = null)
     return id ?? GetShortId_id_Id;
 }
 
-// Generate HTML-friendly element IDs (4 characters)
+// Generate HTML5-compliant element IDs (6 characters)
 public string GetHtmlElementId([UniqueId(UniqueIdFormat.HtmlId)] string id = null)
 {
     return id ?? GetHtmlElementId_id_Id;
@@ -132,10 +132,10 @@ public string CreateOrderId([UniqueId(UniqueIdFormat.Guid)] string id = null)
 
 ### HTML Element IDs
 
-The `HtmlId` format is specifically optimized for HTML elements, generating compact 4-character IDs that comply with HTML standards:
+The `HtmlId` format is specifically optimized for HTML elements, generating compact 6-character IDs that comply with HTML5 standards:
 
 ```csharp
-// Generate HTML-friendly element IDs for different elements
+// Generate HTML5-compliant element IDs for different elements
 public string GenerateButtonId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateButtonId_id_Id;
 public string GenerateInputId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateInputId_id_Id;
 public string GenerateDivId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateDivId_id_Id;
@@ -144,19 +144,20 @@ public string GenerateDivId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) 
 Sample HTML with the generated IDs:
 
 ```html
-<form id="mscl">
-  <div id="osx1">
-    <input id="gft9" type="text" />
-    <button id="z96u">Submit</button>
+<form id="abc1d2">
+  <div id="efg3h4">
+    <input id="ijk5-6" type="text" />
+    <button id="lmn_o7">Submit</button>
   </div>
 </form>
 ```
 
 Key features of the HTML ID format:
-- Just 4 characters long for minimal markup size
-- Always starts with a letter (required by HTML standards)
-- Uses only lowercase letters and numbers (a-z, 0-9)
-- Optimized algorithm to maximize uniqueness in a short format
+- 6 characters long for optimal balance between uniqueness and brevity
+- Always starts with a letter (required by HTML5 standards)
+- Uses lowercase letters, numbers, hyphens, and underscores (a-z, 0-9, -, _)
+- Fully compliant with HTML5 ID specifications
+- Optimized algorithm to maximize uniqueness
 
 ## How It Works
 
@@ -174,7 +175,7 @@ The source generator:
 
 When you compile your code, the source generator adds these constants to your classes, allowing you to reference them in your methods.
 
-For HTML element IDs, the generator uses a specialized algorithm to create compact 4-character IDs that are optimized for HTML usage while still maintaining good uniqueness properties.
+For HTML element IDs, the generator uses a specialized algorithm to create compact 6-character IDs that are fully compliant with HTML5 specifications while still maintaining good uniqueness properties.
 
 ## Benefits Over Manual ID Generation
 
@@ -231,7 +232,7 @@ public string GetGuid([UniqueId(UniqueIdFormat.Guid)] string id = null) => id ??
 // 8-character hexadecimal (short format)
 public string GetHex8([UniqueId(UniqueIdFormat.Hex8)] string id = null) => id ?? GetHex8_id_Id;
 
-// HTML-friendly ID (starts with a letter, uses alphanumeric)
+// HTML5-compliant ID (6 characters, starts with a letter, includes a-z, 0-9, hyphens, underscores)
 public string GetHtmlId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GetHtmlId_id_Id;
 ```
 
@@ -252,14 +253,14 @@ public string CreateTransactionId([UniqueId(UniqueIdFormat.Guid)] string id = nu
 
 ### HTML Element IDs
 
-The `HtmlId` format is specifically designed for HTML elements:
+The `HtmlId` format is specifically designed for HTML5-compliant element IDs:
 
 ```csharp
-// Generate HTML-friendly IDs for elements
+// Generate HTML5-compliant IDs for elements
 public string GenerateButtonId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateButtonId_id_Id;
 
 // Usage
-var buttonId = GenerateButtonId(); // e.g., "btn4a"
+var buttonId = GenerateButtonId(); // e.g., "abc1d2"
 Console.WriteLine($"<button id=\"{buttonId}\">Click me</button>");
 ```
 
