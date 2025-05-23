@@ -1,6 +1,6 @@
-# UniqueIdGenerator
+# Praefixum
 
-[![NuGet](https://img.shields.io/nuget/v/UniqueIdGenerator.svg)](https://www.nuget.org/packages/UniqueIdGenerator)
+[![NuGet](https://img.shields.io/nuget/v/Praefixum.svg)](https://www.nuget.org/packages/Praefixum)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A C# source generator that creates deterministic, compile-time unique IDs for your methods with various format options. No runtime overhead, no external dependencies!
@@ -19,28 +19,28 @@ A C# source generator that creates deterministic, compile-time unique IDs for yo
 Install the NuGet package:
 
 ```bash
-dotnet add package UniqueIdGenerator
+dotnet add package Praefixum
 ```
 
 ### Via NuGet (Package Manager)
 
 ```shell
-Install-Package UniqueIdGenerator
+Install-Package Praefixum
 ```
 
 ### Via .NET CLI
 
 ```shell
-dotnet add package UniqueIdGenerator
+dotnet add package Praefixum
 ```
 
 ### Direct Project Reference
 
-Add a reference to the `UniqueIdGenerator.SourceGen` project:
+Add a reference to the `Praefixum.SourceGen` project:
 
 ```xml
 <ItemGroup>
-  <ProjectReference Include="..\UniqueIdGenerator.SourceGen\UniqueIdGenerator.SourceGen.csproj" 
+  <ProjectReference Include="..\Praefixum.SourceGen\Praefixum.SourceGen.csproj" 
                     OutputItemType="Analyzer" 
                     ReferenceOutputAssembly="false" />
 </ItemGroup>
@@ -48,10 +48,10 @@ Add a reference to the `UniqueIdGenerator.SourceGen` project:
 
 ## Basic Usage
 
-1. Add the UniqueIdGenerator namespace:
+1. Add the Praefixum namespace:
 
 ```csharp
-using UniqueIdGenerator;
+using Praefixum;
 ```
 
 2. Create a method with a parameter marked with the `[UniqueId]` attribute and a default value:
