@@ -5,6 +5,15 @@ All notable changes to the UniqueIdGenerator project will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-05-23
+
+### Changed
+- Updated HtmlId format to be fully HTML5-compliant:
+  - Increased length from 4 to 6 characters for better uniqueness
+  - Added support for hyphens (-) and underscores (_) in IDs
+  - Ensured all IDs start with a letter (HTML5 requirement)
+  - Updated documentation and tests to reflect new format
+
 ## [1.0.2] - 2025-05-22
 
 ### Changed
@@ -29,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Hex16 (16-character hexadecimal, default)
   - Hex32 (32-character hexadecimal)
   - GUID (standard GUID format with dashes)
-  - HtmlId (4-character HTML-friendly ID)
+  - HtmlId (6-character HTML5-compliant ID)
 - Deterministic ID generation based on code location
 - Extensive documentation in README.md
 - MIT license
