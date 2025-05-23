@@ -1,12 +1,12 @@
-﻿using UniqueIdGenerator;
+using Praefixum;
 
-namespace UniqueIdGenerator.Demo;
+namespace Praefixum.Demo;
 
 public partial class Program
 {
     public static void Main()
     {
-        Console.WriteLine("UniqueIdGenerator Demo");
+        Console.WriteLine("Praefixum Demo");
         Console.WriteLine("=====================");
         Console.WriteLine();
 

@@ -1,6 +1,6 @@
 # Development Guide
 
-This document provides guidelines for maintaining and contributing to the UniqueIdGenerator project.
+This document provides guidelines for maintaining and contributing to the Praefixum project.
 
 ## Project Structure
 
@@ -52,7 +52,7 @@ The project uses semantic versioning (SemVer) and GitVersion for automatic versi
 
 ## Performance Considerations
 
-Since the UniqueIdGenerator is used at build time:
+Since the Praefixum is used at build time:
 
 - Try to minimize the build-time impact
 - Avoid unnecessary computations

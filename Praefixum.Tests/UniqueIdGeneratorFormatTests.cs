@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace UniqueIdGenerator.Tests
+namespace Praefixum.Tests
 {
     public class UniqueIdGeneratorFormatTests
     {
@@ -25,7 +25,7 @@ namespace UniqueIdGenerator.Tests
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace MyNamespace
 {
@@ -69,7 +69,7 @@ namespace MyNamespace
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace MyNamespace
 {
@@ -110,7 +110,7 @@ namespace MyNamespace
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace MyNamespace
 {
@@ -150,7 +150,7 @@ namespace MyNamespace
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace MyNamespace
 {
@@ -191,7 +191,7 @@ namespace MyNamespace
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace MyNamespace
 {

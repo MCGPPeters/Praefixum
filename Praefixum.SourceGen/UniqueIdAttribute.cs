@@ -1,6 +1,6 @@
 using System;
 
-namespace UniqueIdGenerator
+namespace Praefixum
 {
     /// <summary>
     /// Format options for UniqueId generation
