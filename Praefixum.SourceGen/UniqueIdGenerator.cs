@@ -173,6 +173,7 @@ namespace Praefixum
                 // Generate source for each type that has parameters with UniqueIdAttribute
                 foreach (var typeEntry in typeToParams)
                 {
+
                     var typeSymbol = typeEntry.Key;
                     var methodParams = typeEntry.Value;
 
@@ -189,9 +190,9 @@ namespace Praefixum
 
                     var className = typeSymbol.Name;
                     var isStatic = typeSymbol.IsStatic;
-                    var classModifier = isStatic ? "static" : "partial";
-
-                    sb.AppendLine($"    {classModifier} class {className}");
+                    // Always emit partial, add static if needed
+                    var classModifiers = isStatic ? "static partial" : "partial";
+                    sb.AppendLine($"    {classModifiers} class {className}");
                     sb.AppendLine("    {");
 
                     foreach (var methodEntry in methodParams)
