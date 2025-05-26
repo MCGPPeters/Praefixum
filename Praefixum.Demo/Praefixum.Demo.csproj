@@ -9,8 +9,7 @@
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
   
-  <ItemGroup>
-    <ProjectReference Include="..\Praefixum.SourceGen\Praefixum.SourceGen.csproj" 
+  <ItemGroup>    <ProjectReference Include="..\Praefixum.SourceGen\Praefixum.SourceGen.csproj" 
                       OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="true" />
   </ItemGroup>

@@ -51,18 +51,14 @@ public partial class Program
 
         // Test case for multiple attributes on the same line
         TestMultipleAttributesOnSameLine();
-        
-        // Test HTML ID generation
+          // Test HTML ID generation
         TestHtmlIdGeneration();
-    }
-    
-    // This method generates a unique ID with the default format (Hex16)
+    }// This method generates a unique ID with the default format (Hex16)
     public static string GenerateId([UniqueId] string id = null)
     {
-        return id ?? GenerateId_id_Id;
+        return id ?? GenerateId_String_id_Id;
     }
-    
-    // Another method that uses the unique ID generator
+      // Another method that uses the unique ID generator
     public static string GenerateAnotherUniqueId([UniqueId] string uniqueId = null)
     {
         return uniqueId ?? GenerateAnotherUniqueId_uniqueId_Id;
@@ -116,10 +112,9 @@ public partial class Program
         // Check if they're unique
         Console.WriteLine($"Are the IDs unique? {sameLineId1 != sameLineId2}");
     }
-    
-    // Methods that will be on the same line in the source code
+      // Methods that will be on the same line in the source code
     public static string GenerateSameLineId1([UniqueId] string id = null) => id ?? GenerateSameLineId1_id_Id;
-    public static string GenerateSameLineId2([UniqueId] string id = null) => id ?? GenerateSameLineId2_id_Id;    // HTML ID generation examples    
+    public static string GenerateSameLineId2([UniqueId] string id = null) => id ?? GenerateSameLineId2_id_Id;// HTML ID generation examples    
     public static void TestHtmlIdGeneration()
     {        Console.WriteLine("\nHTML5-Compliant Element ID Generation:");
         Console.WriteLine("-----------------------------------");
@@ -143,13 +138,11 @@ public partial class Program
         Console.WriteLine($"    <button id=\"{buttonId}\">Submit</button>");
         Console.WriteLine($"  </div>");
         Console.WriteLine($"</form>");
-    }
-    // Methods for generating HTML5-compliant element IDs using the HtmlId format
+    }    // Methods for generating HTML5-compliant element IDs using the HtmlId format
     // These IDs start with a letter and can contain letters, digits, hyphens (-), and underscores (_)
     public static string GenerateHtmlButtonId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlButtonId_id_Id;
     public static string GenerateHtmlInputId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlInputId_id_Id;
-    public static string GenerateHtmlDivId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlDivId_id_Id;
-    public static string GenerateHtmlFormId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlFormId_id_Id;
+    public static string GenerateHtmlDivId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlDivId_id_Id;    public static string GenerateHtmlFormId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlFormId_id_Id;
 }
 
 public partial class Helper
@@ -157,6 +150,6 @@ public partial class Helper
     // Method in a different class that generates another unique ID
     public string GetUniqueId([UniqueId] string id = null)
     {
-        return id ?? GetUniqueId_id_Id;
+        return id ?? GetUniqueId_String_id_Id;
     }
 }
