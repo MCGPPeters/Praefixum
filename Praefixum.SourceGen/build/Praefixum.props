@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- Enable source generators -->
+    <EnableSourceGenerators Condition="'$(EnableSourceGenerators)' == ''">true</EnableSourceGenerators>
+  </PropertyGroup>
+</Project>
