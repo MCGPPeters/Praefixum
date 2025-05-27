@@ -5,9 +5,31 @@ All notable changes to the Praefixum project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.18] - 2025-05-27
+
+### Fixed
+
+- **Critical**: Fixed source generator NuGet package consumption
+  - Resolved dual reference conflicts that prevented source generator from working when consumed as NuGet package
+  - Fixed package structure: source generator now correctly placed in `analyzers/dotnet/cs/` folder only
+  - Added proper MSBuild integration with build targets for NuGet packages
+  - Removed unreliable PostInitialization code that was causing issues in packaged scenarios
+  - Source generator now works correctly when consumed via NuGet package reference
+- Improved package configuration:
+  - Changed `IncludeBuildOutput` to `true` for proper assembly inclusion
+  - Changed `DevelopmentDependency` to `false` to ensure package works in consuming projects
+  - Added proper build and buildTransitive folders for MSBuild integration
+- Cleaned up package contents and removed old package versions
+
+### Added
+
+- Created comprehensive test project to validate NuGet package functionality
+- Added proper fallback pattern using null-coalescing operator (??) for generated constants
+
 ## [1.1.0] - 2025-05-23
 
 ### Changed
+
 - Updated HtmlId format to be fully HTML5-compliant:
   - Increased length from 4 to 6 characters for better uniqueness
   - Added support for hyphens (-) and underscores (_) in IDs

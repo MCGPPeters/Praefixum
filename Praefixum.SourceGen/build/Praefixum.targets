@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemGroup>
+    <!-- Reference the source generator as an analyzer -->
+    <Analyzer Include="$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Praefixum.SourceGen.dll" Condition="Exists('$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Praefixum.SourceGen.dll')" />
+  </ItemGroup>
+</Project>
