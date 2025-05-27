@@ -14,10 +14,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" PrivateAssets="all" />
-  </ItemGroup>
-  <!-- NuGet package configuration -->
-  <PropertyGroup>    
-    <PackageId>Praefixum</PackageId>
+  </ItemGroup>  <!-- NuGet package configuration -->
+  <PropertyGroup>      <PackageId>Praefixum</PackageId>
+    <Version>1.0.18</Version>
     <!-- Version will be set by GitVersion in CI pipeline -->
     <Authors>MCGPPeters</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -27,12 +26,12 @@
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>A C# source generator that creates compile-time unique IDs for your methods with various format options.</Description>
-    <PackageReleaseNotes>Fixed nullability warnings and improved NuGet package.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed source generator packaging for proper NuGet consumption.</PackageReleaseNotes>
     <Copyright>Copyright © 2025</Copyright>
     <PackageTags>source-generator;roslyn;unique-id;guid;identifier</PackageTags>
-    <!-- <PackageIcon>icon.png</PackageIcon> -->
-    <NoPackageAnalysis>true</NoPackageAnalysis>
-    <DevelopmentDependency>true</DevelopmentDependency>
+    <!-- <PackageIcon>icon.png</PackageIcon> -->    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <DevelopmentDependency>false</DevelopmentDependency>
+    <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
   </PropertyGroup>
 
   <!-- Package contents -->
@@ -40,18 +39,25 @@
     <None Include="..\README.md" Pack="true" PackagePath="\" Visible="false" />
     <None Include="..\LICENSE" Pack="true" PackagePath="\" Visible="false" />
     <None Include="..\assets\icon.png" Pack="true" PackagePath="\" Visible="false" />
-  </ItemGroup>
-
-  <!-- Source generator specific settings -->
+  </ItemGroup>  <!-- Source generator specific settings -->
   <PropertyGroup>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
-
-  <!-- Add the source generator to the analyzer package -->
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup><!-- Package the source generator and attribute assembly -->
   <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="_._" Pack="true" PackagePath="lib/netstandard2.0/" />
+    <!-- Include the source generator as an analyzer -->
+    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers\dotnet\cs\$(AssemblyName).dll" Visible="false" />
+    
+    <!-- Include the assembly in lib folder for attributes -->
+    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="lib\netstandard2.0\$(AssemblyName).dll" Visible="false" />
+  </ItemGroup>
+  <!-- Build targets to ensure proper analyzer reference -->
+  <ItemGroup>
+    <None Include="$(MSBuildProjectDirectory)\build\Praefixum.props" Pack="true" PackagePath="build\Praefixum.props" Visible="false" />
+    <None Include="$(MSBuildProjectDirectory)\build\Praefixum.targets" Pack="true" PackagePath="build\Praefixum.targets" Visible="false" />
+    <None Include="$(MSBuildProjectDirectory)\build\Praefixum.props" Pack="true" PackagePath="buildTransitive\Praefixum.props" Visible="false" />
+    <None Include="$(MSBuildProjectDirectory)\build\Praefixum.targets" Pack="true" PackagePath="buildTransitive\Praefixum.targets" Visible="false" />
   </ItemGroup>
 
 </Project>
