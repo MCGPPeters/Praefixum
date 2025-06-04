@@ -144,7 +144,7 @@ public class UniqueIdGeneratorEdgeCaseTests
     }
 
     [Fact]
-    public void GenerateId_ThreadSafety_ProducesUniqueIdsAcrossThreads()
+    public async void GenerateId_ThreadSafety_ProducesUniqueIdsAcrossThreads()
     {
         // Arrange
         const int threadsCount = 10;
@@ -170,9 +170,9 @@ public class UniqueIdGeneratorEdgeCaseTests
                 }
             }))
             .ToArray();
-            
-        Task.WaitAll(tasks);
-        
+
+        await Task.WhenAll(tasks);
+
         // Assert
         var expectedCount = threadsCount * idsPerThread;
         Assert.Equal(expectedCount, allIds.Count);
