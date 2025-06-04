@@ -1,21 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);Praefixum</InterceptorsNamespaces>
   </PropertyGroup>
-  
-  <ItemGroup>    <ProjectReference Include="..\Praefixum.SourceGen\Praefixum.SourceGen.csproj" 
-                      OutputItemType="Analyzer" 
-                      ReferenceOutputAssembly="true" />
-  </ItemGroup>
-  
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
+    <ProjectReference Include="..\Praefixum\Praefixum.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
-
 </Project>
