@@ -86,11 +86,10 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 
         // Extract the data parameter from the intercepts location attribute syntax
         var attributeSyntax = interceptableLocation.GetInterceptsLocationAttributeSyntax();
-        var dataValue = ExtractDataFromAttributeSyntax(attributeSyntax);
-
-        return new MethodCallInfo(
+        var dataValue = ExtractDataFromAttributeSyntax(attributeSyntax);        return new MethodCallInfo(
             method.ContainingType.ToDisplayString(),
             method.Name,
+            method.ReturnType.ToDisplayString(),
             dataValue,
             method.Parameters.ToArray(),
             parametersWithUniqueId.Select(x => new ParameterInfo(
@@ -99,7 +98,7 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
                 GetPrefix(x.param),
                 GetDeterministic(x.param)
             )).ToList()
-        );    }
+        );}
 
     private static string ExtractDataFromAttributeSyntax(string attributeSyntax)
     {
@@ -192,9 +191,8 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 
             var uniqueIdParam = call.Parameters.First(p => p.GetAttributes().Any(attr => 
                 attr.AttributeClass?.Name == "UniqueIdAttribute"));
-            var uniqueIdInfo = call.UniqueIdParameters.First();
-            sb.AppendLine($"    [InterceptsLocation(1,\"{call.InterceptsLocationData}\")]");
-            sb.AppendLine($"    public static string {call.MethodName}_{i}(");
+            var uniqueIdInfo = call.UniqueIdParameters.First();            sb.AppendLine($"    [InterceptsLocation(1,\"{call.InterceptsLocationData}\")]");
+            sb.AppendLine($"    public static {call.ReturnType} {call.MethodName}_{i}(");
             
             // Generate exact method signature
             for (int j = 0; j < call.Parameters.Length; j++)
@@ -220,10 +218,19 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
             }
             sb.AppendLine(")");
             sb.AppendLine("    {");
-            
-            // If the unique ID parameter is not null, return the original method call
+              // If the unique ID parameter is not null, call the original method
             sb.AppendLine($"        if ({uniqueIdParam.Name} != null)");
-            sb.AppendLine($"            return {call.ContainingType}.{call.MethodName}({string.Join(", ", call.Parameters.Select(p => p.Name))});");
+            if (call.ReturnType == "void")
+            {
+                sb.AppendLine($"        {{");
+                sb.AppendLine($"            {call.ContainingType}.{call.MethodName}({string.Join(", ", call.Parameters.Select(p => p.Name))});");
+                sb.AppendLine($"            return;");
+                sb.AppendLine($"        }}");
+            }
+            else
+            {
+                sb.AppendLine($"            return {call.ContainingType}.{call.MethodName}({string.Join(", ", call.Parameters.Select(p => p.Name))});");
+            }
             sb.AppendLine();
             
             // Generate unique ID based on call site
@@ -245,7 +252,15 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
             // Call original method with generated ID
             var args = string.Join(", ", call.Parameters.Select(p => 
                 p.Name == uniqueIdParam.Name ? "generatedId" : p.Name));
-            sb.AppendLine($"        return {call.ContainingType}.{call.MethodName}({args});");
+            
+            if (call.ReturnType == "void")
+            {
+                sb.AppendLine($"        {call.ContainingType}.{call.MethodName}({args});");
+            }
+            else
+            {
+                sb.AppendLine($"        return {call.ContainingType}.{call.MethodName}({args});");
+            }
             sb.AppendLine("    }");
             sb.AppendLine();
         }
@@ -289,6 +304,7 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 public record MethodCallInfo(
     string ContainingType,
     string MethodName,
+    string ReturnType,
     string InterceptsLocationData,
     IParameterSymbol[] Parameters,
     List<ParameterInfo> UniqueIdParameters
