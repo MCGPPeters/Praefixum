@@ -5,6 +5,49 @@ All notable changes to the Praefixum project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-06-04
+
+### Added
+
+- **Major**: Comprehensive test suite with 44+ tests covering all functionality
+  - Basic functionality tests (12 tests)
+  - Format validation tests (11 tests)
+  - Edge case and error condition tests (11 tests)
+  - Performance and concurrency tests (10 tests)
+  - Reusable test helpers and utilities
+- **Documentation**: Complete documentation overhaul
+  - Comprehensive README.md with examples and usage guides
+  - Updated CONTRIBUTING.md with development guidelines
+  - Detailed API documentation and troubleshooting guides
+
+### Changed
+
+- **Breaking**: Updated to .NET 9 interceptor implementation
+  - Moved from separate InterceptsLocationAttribute generation to inline generation
+  - Changed all generated namespaces from file-scoped to block-scoped
+  - Updated InterceptsLocationAttribute to use proper .NET 9 format
+- **Improved**: Source generator robustness and error handling
+  - Fixed attribute data parsing with proper syntax analysis
+  - Enhanced error diagnostics and reporting
+  - Better handling of edge cases and invalid scenarios
+
+### Fixed
+
+- **Critical**: InterceptsLocationAttribute implementation for .NET 9
+  - Fixed constructor parameter matching and quoting issues
+  - Resolved file placement and compilation errors
+  - Corrected attribute usage and parameter passing
+- **Build**: Resolved all compilation warnings and errors
+  - Fixed project references and dependencies
+  - Cleaned up NuGet package warnings
+  - Improved build reliability across different environments
+
+### Performance
+
+- **Optimized**: Source generator performance and memory usage
+- **Enhanced**: Compilation speed with better syntax node filtering
+- **Improved**: Thread safety and concurrency handling
+
 ## [1.0.18] - 2025-05-27
 
 ### Fixed
