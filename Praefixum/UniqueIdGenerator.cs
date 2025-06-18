@@ -9,50 +9,17 @@ using System.Text;
 
 namespace Praefixum;
 
-// Enum used by the source generator internally
-internal enum UniqueIdFormat
-{
-    Guid,
-    HtmlId,
-    Timestamp,
-    ShortHash
-}
+// The UniqueIdFormat enum and UniqueIdAttribute are provided directly in the
+// library (UniqueIdAttribute.cs). They no longer need to be generated at
+// initialization time.
 
 [Generator]
 public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
-    {        // Register the attribute source first
-        context.RegisterPostInitializationOutput(ctx =>
-        {            ctx.AddSource("UniqueIdAttribute.g.cs", SourceText.From("""
-                #nullable enable
-                namespace Praefixum
-                {
-                    [System.AttributeUsage(System.AttributeTargets.Parameter)]
-                    public sealed class UniqueIdAttribute : System.Attribute
-                    {
-                        public UniqueIdFormat Format { get; }
-                        public string? Prefix { get; }
-                        public bool Deterministic { get; }
-
-                        public UniqueIdAttribute(UniqueIdFormat format = UniqueIdFormat.Guid, string? prefix = null, bool deterministic = true)
-                        {
-                            Format = format;
-                            Prefix = prefix;
-                            Deterministic = deterministic;
-                        }
-                    }
-
-                    public enum UniqueIdFormat
-                    {
-                        Guid,
-                        HtmlId,
-                        Timestamp,
-                        ShortHash
-                    }
-                }
-                """, Encoding.UTF8));
-        });
+    {
+        // Attribute and enum definitions are compiled into the library so no
+        // additional sources need to be injected here.
 
         // Find method calls that need interception
         var methodCallsProvider = context.SyntaxProvider
