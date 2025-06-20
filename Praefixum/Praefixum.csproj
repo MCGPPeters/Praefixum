@@ -53,8 +53,6 @@
     <!-- Include the source generator as an analyzer -->
     <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers\dotnet\cs\$(AssemblyName).dll" Visible="false" />
     
-    <!-- Include the assembly in lib folder for attributes -->
-    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="lib\netstandard2.0\$(AssemblyName).dll" Visible="false" />
   </ItemGroup>
   <!-- Build targets to ensure proper analyzer reference -->
   <ItemGroup>
