@@ -21,37 +21,47 @@ internal enum UniqueIdFormat
 [Generator]
 public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 {
+    private const string AttributeSource = """
+#nullable enable
+namespace Praefixum
+{
+    [System.AttributeUsage(System.AttributeTargets.Parameter)]
+    public sealed class UniqueIdAttribute : System.Attribute
+    {
+        public UniqueIdFormat Format { get; }
+        public string? Prefix { get; }
+        public bool Deterministic { get; }
+
+        public UniqueIdAttribute(UniqueIdFormat format = UniqueIdFormat.Guid, string? prefix = null, bool deterministic = true)
+        {
+            Format = format;
+            Prefix = prefix;
+            Deterministic = deterministic;
+        }
+    }
+
+    public enum UniqueIdFormat
+    {
+        Guid,
+        HtmlId,
+        Timestamp,
+        ShortHash
+    }
+}
+""";
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
-    {        // Register the attribute source first
-        context.RegisterPostInitializationOutput(ctx =>
-        {            ctx.AddSource("UniqueIdAttribute.g.cs", SourceText.From("""
-                #nullable enable
-                namespace Praefixum
-                {
-                    [System.AttributeUsage(System.AttributeTargets.Parameter)]
-                    public sealed class UniqueIdAttribute : System.Attribute
-                    {
-                        public UniqueIdFormat Format { get; }
-                        public string? Prefix { get; }
-                        public bool Deterministic { get; }
+    {
+        // Determine if the consumer already has the attribute defined
+        var needsAttribute = context.CompilationProvider.Select(static (comp, _) =>
+            comp.GetTypeByMetadataName("Praefixum.UniqueIdAttribute") is null);
 
-                        public UniqueIdAttribute(UniqueIdFormat format = UniqueIdFormat.Guid, string? prefix = null, bool deterministic = true)
-                        {
-                            Format = format;
-                            Prefix = prefix;
-                            Deterministic = deterministic;
-                        }
-                    }
-
-                    public enum UniqueIdFormat
-                    {
-                        Guid,
-                        HtmlId,
-                        Timestamp,
-                        ShortHash
-                    }
-                }
-                """, Encoding.UTF8));
+        context.RegisterSourceOutput(needsAttribute, static (ctx, needs) =>
+        {
+            if (needs)
+            {
+                ctx.AddSource("UniqueIdAttribute.g.cs", SourceText.From(AttributeSource, Encoding.UTF8));
+            }
         });
 
         // Find method calls that need interception
