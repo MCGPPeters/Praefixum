@@ -121,20 +121,18 @@ public partial class Program
     public static string GenerateSameLineId1([UniqueId] string id = null) => id ?? GenerateSameLineId1_id_Id;
     public static string GenerateSameLineId2([UniqueId] string id = null) => id ?? GenerateSameLineId2_id_Id;    // HTML ID generation examples    
     public static void TestHtmlIdGeneration()
-    {
-        Console.WriteLine("\nHTML Element ID Generation:");
-        Console.WriteLine("--------------------------");
+    {        Console.WriteLine("\nHTML5-Compliant Element ID Generation:");
+        Console.WriteLine("-----------------------------------");
         
         // Generate multiple HTML element IDs
         var buttonId = GenerateHtmlButtonId();
         var inputId = GenerateHtmlInputId();
         var divId = GenerateHtmlDivId();
         var formId = GenerateHtmlFormId();
-        
-        Console.WriteLine($"Button ID: \"{buttonId}\" (4 chars)");
-        Console.WriteLine($"Input ID:  \"{inputId}\" (4 chars)");
-        Console.WriteLine($"Div ID:    \"{divId}\" (4 chars)");
-        Console.WriteLine($"Form ID:   \"{formId}\" (4 chars)");
+          Console.WriteLine($"Button ID: \"{buttonId}\" (6 chars, HTML5 compliant)");
+        Console.WriteLine($"Input ID:  \"{inputId}\" (6 chars, HTML5 compliant)");
+        Console.WriteLine($"Div ID:    \"{divId}\" (6 chars, HTML5 compliant)");
+        Console.WriteLine($"Form ID:   \"{formId}\" (6 chars, HTML5 compliant)");
         
         // Sample HTML with the generated IDs
         Console.WriteLine("\nSample HTML with Compact IDs:");
@@ -146,7 +144,8 @@ public partial class Program
         Console.WriteLine($"  </div>");
         Console.WriteLine($"</form>");
     }
-      // Methods for generating HTML element IDs using the new HtmlId format
+    // Methods for generating HTML5-compliant element IDs using the HtmlId format
+    // These IDs start with a letter and can contain letters, digits, hyphens (-), and underscores (_)
     public static string GenerateHtmlButtonId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlButtonId_id_Id;
     public static string GenerateHtmlInputId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlInputId_id_Id;
     public static string GenerateHtmlDivId([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GenerateHtmlDivId_id_Id;

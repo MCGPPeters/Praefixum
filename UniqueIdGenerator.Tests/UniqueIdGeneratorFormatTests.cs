@@ -219,13 +219,15 @@ namespace MyNamespace
             // Extract the generated ID
             var match = Regex.Match(generatedCode, @"public const string GetId_id_Id = ""([a-zA-Z0-9\-_:\.]+)"";");
             Assert.True(match.Success);
-            
-            // Verify it starts with a letter (HTML ID requirement)
+              // Verify it starts with a letter (HTML ID requirement)
             var generatedId = match.Groups[1].Value;
             Assert.Matches("^[a-zA-Z]", generatedId);
             
+            // Verify it is exactly 6 characters long (updated HTML ID format)
+            Assert.Equal(6, generatedId.Length);
+            
             // Verify it only contains valid HTML ID characters
-            Assert.Matches("^[a-zA-Z0-9\\-_:]+$", generatedId);
+            Assert.Matches("^[a-zA-Z][a-zA-Z0-9\\-_]+$", generatedId);
         }
     }
 }
