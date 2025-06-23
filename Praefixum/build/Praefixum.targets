@@ -2,6 +2,6 @@
 <Project>
   <ItemGroup>
     <!-- Reference the source generator as an analyzer -->
-    <Analyzer Include="$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Praefixum.SourceGen.dll" Condition="Exists('$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Praefixum.SourceGen.dll')" />
+    <Analyzer Include="$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Praefixum.dll" Condition="Exists('$(MSBuildThisFileDirectory)..\analyzers\dotnet\cs\Praefixum.dll')" />
   </ItemGroup>
 </Project>
