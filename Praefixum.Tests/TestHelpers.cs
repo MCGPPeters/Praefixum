@@ -8,7 +8,166 @@ namespace Praefixum.Tests;
 /// These methods simulate code that would use the UniqueId attribute
 /// </summary>
 public static class TestHelpers
-{    /// <summary>
+{
+    // ==========================================
+    // ACTUAL METHODS WITH [UniqueId] ATTRIBUTES
+    // These methods will trigger the source generator and interceptors
+    // ==========================================
+
+    /// <summary>
+    /// Creates an HTML div with a unique ID using the default format
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateDiv([UniqueId] string? id = null, string content = "")
+    {
+        return $"<div id=\"{id}\">{content}</div>";
+    }
+
+    /// <summary>
+    /// Creates an HTML button with a GUID-format unique ID
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateButtonWithGuid([UniqueId(UniqueIdFormat.Guid)] string? id = null, string text = "Click me")
+    {
+        return $"<button id=\"{id}\">{text}</button>";
+    }
+
+    /// <summary>
+    /// Creates an HTML input with an HTML-safe unique ID
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateInputWithHtmlId([UniqueId(UniqueIdFormat.HtmlId)] string? id = null, string type = "text")
+    {
+        return $"<input id=\"{id}\" type=\"{type}\" />";
+    }
+
+    /// <summary>
+    /// Creates an HTML span with a prefixed unique ID
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateSpanWithPrefix([UniqueId(prefix: "span-")] string? id = null, string content = "")
+    {
+        return $"<span id=\"{id}\">{content}</span>";
+    }
+
+    /// <summary>
+    /// Creates an HTML section with a timestamp-based unique ID
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateSectionWithTimestamp([UniqueId(UniqueIdFormat.Timestamp)] string? id = null, string content = "")
+    {
+        return $"<section id=\"{id}\">{content}</section>";
+    }
+
+    /// <summary>
+    /// Creates an HTML article with a short hash unique ID
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateArticleWithShortHash([UniqueId(UniqueIdFormat.ShortHash)] string? id = null, string content = "")
+    {
+        return $"<article id=\"{id}\">{content}</article>";
+    }
+
+    /// <summary>
+    /// Creates an HTML form with multiple UniqueId parameters
+    /// This method uses multiple [UniqueId] attributes and will trigger source generation
+    /// </summary>
+    public static string CreateFormWithMultipleIds(
+        [UniqueId(prefix: "form-")] string? formId = null,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? nameInputId = null,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? emailInputId = null,
+        [UniqueId(UniqueIdFormat.Guid)] string? submitButtonId = null)
+    {
+        return $"""
+            <form id="{formId}">
+                <input id="{nameInputId}" type="text" name="name" />
+                <input id="{emailInputId}" type="email" name="email" />
+                <button id="{submitButtonId}" type="submit">Submit</button>
+            </form>
+            """;
+    }
+
+    /// <summary>
+    /// Method with different return type and UniqueId parameter
+    /// Tests that the generator preserves return types correctly
+    /// </summary>
+    public static string GetIdForElement([UniqueId] string? id = null)
+    {
+        return id ?? throw new InvalidOperationException("ID should have been generated");
+    }
+
+    /// <summary>
+    /// Method with int return type and UniqueId parameter
+    /// Tests that the generator preserves return types correctly
+    /// </summary>
+    public static int GetHashFromId([UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return id?.GetHashCode() ?? 0;
+    }
+
+    /// <summary>
+    /// Method with bool return type and UniqueId parameter
+    /// Tests that the generator preserves return types correctly
+    /// </summary>
+    public static bool IsValidId([UniqueId(UniqueIdFormat.Guid)] string? id = null)
+    {
+        return !string.IsNullOrEmpty(id) && id.Length > 0;
+    }
+
+    /// <summary>
+    /// Void method with UniqueId parameter
+    /// Tests that the generator works with void methods
+    /// </summary>
+    public static void ProcessElementWithId([UniqueId(prefix: "process-")] string? id = null)
+    {
+        LastProcessedId = id;
+    }
+
+    /// <summary>
+    /// Async method with UniqueId parameter
+    /// Tests that the generator works with async methods
+    /// </summary>
+    public static async Task<string> CreateElementAsync([UniqueId(UniqueIdFormat.HtmlId)] string? id = null, string tag = "div")
+    {
+        await Task.Delay(1); // Simulate async work
+        return $"<{tag} id=\"{id}\"></{tag}>";
+    }
+
+    /// <summary>
+    /// Generic method with UniqueId parameter
+    /// Tests that the generator works with generic methods
+    /// </summary>
+    public static List<T> CreateListWithId<T>(T[] items, [UniqueId] string? id = null)
+    {
+        // Store the ID for testing
+        LastGeneratedId = id;
+        return [.. items];
+    }
+
+    /// <summary>
+    /// Method with multiple parameters where only one has UniqueId
+    /// Tests selective parameter handling
+    /// </summary>
+    public static string CreateComplexElement(
+        string tag,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null,
+        string? className = null,
+        string content = "")
+    {
+        var classAttr = string.IsNullOrEmpty(className) ? "" : $" class=\"{className}\"";
+        return $"<{tag} id=\"{id}\"{classAttr}>{content}</{tag}>";
+    }
+
+    /// <summary>
+    /// Property to store the last processed ID for void method testing
+    /// </summary>
+    public static string? LastProcessedId { get; private set; }
+
+    // ==========================================
+    // LEGACY SIMULATION METHODS (keeping for backward compatibility)
+    // ==========================================
+
+    /// <summary>
     /// Creates an HTML element with the specified tag and id
     /// This simulates a method that would have [UniqueId] on the id parameter
     /// </summary>
@@ -20,7 +179,9 @@ public static class TestHelpers
             id = GenerateUniqueId();
         }
         return $"<{tag} id=\"{id}\"></{tag}>";
-    }    /// <summary>
+    }
+
+    /// <summary>
     /// Creates an HTML element with custom attributes
     /// This simulates a method that would have [UniqueId] on the id parameter
     /// </summary>
@@ -42,7 +203,9 @@ public static class TestHelpers
             
         sb.Append($"></{tag}>");
         return sb.ToString();
-    }    /// <summary>
+    }
+
+    /// <summary>
     /// Creates a button with unique ID and specified text
     /// This simulates a method that would have [UniqueId(UniqueIdFormat.Guid)] on the id parameter
     /// </summary>
@@ -146,7 +309,9 @@ public static class TestHelpers
             
         // HTML5 IDs must not contain spaces and should be unique
         return !id.Contains(' ') && id.Length > 0;
-    }    /// <summary>
+    }
+
+    /// <summary>
     /// Creates a form with multiple inputs having unique IDs
     /// </summary>
     public static string CreateForm()

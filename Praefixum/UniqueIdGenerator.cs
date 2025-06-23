@@ -192,15 +192,11 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         sb.AppendLine("{");
         sb.AppendLine("    private static readonly Dictionary<string, int> _callsiteCounts = new();");
         sb.AppendLine("    private static readonly object _lock = new();");
-        sb.AppendLine();
-
-        for (int i = 0; i < calls.Length; i++)
+        sb.AppendLine();        for (int i = 0; i < calls.Length; i++)
         {
             var call = calls[i];
 
-            var uniqueIdParam = call.Parameters.First(p => p.GetAttributes().Any(attr => 
-                attr.AttributeClass?.Name == "UniqueIdAttribute"));
-            var uniqueIdInfo = call.UniqueIdParameters.First();            sb.AppendLine($"    [InterceptsLocation(1,\"{call.InterceptsLocationData}\")]");
+            sb.AppendLine($"    [InterceptsLocation(1,\"{call.InterceptsLocationData}\")]");
             sb.AppendLine($"    public static {call.ReturnType} {call.MethodName}_{i}(");
             
             // Generate exact method signature
@@ -226,9 +222,20 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
                 }
             }
             sb.AppendLine(")");
-            sb.AppendLine("    {");
-              // If the unique ID parameter is not null, call the original method
-            sb.AppendLine($"        if ({uniqueIdParam.Name} != null)");
+            sb.AppendLine("    {");            // Check if ALL unique ID parameters are provided - if so, call original method
+            var uniqueIdParams = call.Parameters.Where(p => p.GetAttributes().Any(attr => 
+                attr.AttributeClass?.Name == "UniqueIdAttribute")).ToList();
+            
+            if (uniqueIdParams.Count > 1)
+            {
+                var conditions = string.Join(" && ", uniqueIdParams.Select(p => $"{p.Name} != null"));
+                sb.AppendLine($"        if ({conditions})");
+            }
+            else
+            {
+                sb.AppendLine($"        if ({uniqueIdParams[0].Name} != null)");
+            }
+            
             if (call.ReturnType == "void")
             {
                 sb.AppendLine($"        {{");
@@ -242,25 +249,47 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
             }
             sb.AppendLine();
             
-            // Generate unique ID based on call site
-            sb.AppendLine($"        var key = \"{call.InterceptsLocationData}\";");
-            sb.AppendLine("        int count;");
-            sb.AppendLine();
-            sb.AppendLine("        lock (_lock)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            if (!_callsiteCounts.TryGetValue(key, out count))");
-            sb.AppendLine("                count = 0;");
-            sb.AppendLine("            _callsiteCounts[key] = count + 1;");
-            sb.AppendLine("        }");
-            sb.AppendLine();
+            // Generate IDs for each null UniqueId parameter
+            var parameterAssignments = new List<string>();
+            for (int paramIndex = 0; paramIndex < call.Parameters.Length; paramIndex++)
+            {
+                var param = call.Parameters[paramIndex];
+                var uniqueIdInfo = call.UniqueIdParameters.FirstOrDefault(u => u.Index == paramIndex);
+                
+                if (uniqueIdInfo != null)
+                {
+                    // This parameter has [UniqueId] - generate ID if null
+                    sb.AppendLine($"        // Generate {param.Name} if null");
+                    sb.AppendLine($"        var {param.Name}Final = {param.Name};");
+                    sb.AppendLine($"        if ({param.Name}Final == null)");
+                    sb.AppendLine("        {");
+                    sb.AppendLine($"            var key{paramIndex} = \"{call.InterceptsLocationData}:{paramIndex}\";");
+                    sb.AppendLine($"            int count{paramIndex};");
+                    sb.AppendLine();
+                    sb.AppendLine("            lock (_lock)");
+                    sb.AppendLine("            {");
+                    sb.AppendLine($"                if (!_callsiteCounts.TryGetValue(key{paramIndex}, out count{paramIndex}))");
+                    sb.AppendLine($"                    count{paramIndex} = 0;");
+                    sb.AppendLine($"                _callsiteCounts[key{paramIndex}] = count{paramIndex} + 1;");
+                    sb.AppendLine("            }");
+                    sb.AppendLine();
+                    
+                    var format = uniqueIdInfo.Format;
+                    var prefix = uniqueIdInfo.Prefix != null ? $"\"{uniqueIdInfo.Prefix}\"" : "null";
+                    sb.AppendLine($"            {param.Name}Final = GenerateId(key{paramIndex}, count{paramIndex}, UniqueIdFormat.{format}, {prefix});");
+                    sb.AppendLine("        }");
+                    sb.AppendLine();
+                    
+                    parameterAssignments.Add($"{param.Name}Final");
+                }
+                else
+                {
+                    parameterAssignments.Add(param.Name);
+                }
+            }
             
-            var format = uniqueIdInfo.Format;
-            var prefix = uniqueIdInfo.Prefix != null ? $"\"{uniqueIdInfo.Prefix}\"" : "null";
-            sb.AppendLine($"        var generatedId = GenerateId(key, count, UniqueIdFormat.{format}, {prefix});");
-            
-            // Call original method with generated ID
-            var args = string.Join(", ", call.Parameters.Select(p => 
-                p.Name == uniqueIdParam.Name ? "generatedId" : p.Name));
+            // Call original method with all parameters (generated or original)
+            var args = string.Join(", ", parameterAssignments);
             
             if (call.ReturnType == "void")
             {
@@ -275,20 +304,18 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         }
 
         sb.AppendLine("    private static string GenerateId(string key, int count, UniqueIdFormat format = UniqueIdFormat.HtmlId, string? prefix = null)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        string baseId = format switch");
+        sb.AppendLine("    {");        sb.AppendLine("        string baseId = format switch");
         sb.AppendLine("        {");
-        sb.AppendLine("            UniqueIdFormat.Guid => Guid.NewGuid().ToString(\"N\"),");
+        sb.AppendLine("            UniqueIdFormat.Guid => DeterministicGuid(key, count),");
         sb.AppendLine("            UniqueIdFormat.Timestamp => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),");
         sb.AppendLine("            UniqueIdFormat.ShortHash => ShortHash(key, count),");
         sb.AppendLine("            UniqueIdFormat.HtmlId => HtmlSafeId(ShortHash(key, count)),");
         sb.AppendLine("            _ => throw new ArgumentOutOfRangeException()");
-        sb.AppendLine("        };");
+        sb.AppendLine("        }; // Fixed GUID generation");
         sb.AppendLine();
         sb.AppendLine("        return prefix is null ? baseId : $\"{prefix}{baseId}\";");
         sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private static string ShortHash(string key, int count)");
+        sb.AppendLine();        sb.AppendLine("    private static string ShortHash(string key, int count)");
         sb.AppendLine("    {");
         sb.AppendLine("        using var sha256 = SHA256.Create();");
         sb.AppendLine("        var inputBytes = Encoding.UTF8.GetBytes($\"{key}:{count}\");");
@@ -296,6 +323,18 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         sb.AppendLine("        return Convert.ToBase64String(hashBytes)");
         sb.AppendLine("            .Replace(\"+\", \"a\").Replace(\"/\", \"b\").Replace(\"=\", string.Empty)");
         sb.AppendLine("            .Substring(0, 8);");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+        sb.AppendLine("    private static string DeterministicGuid(string key, int count)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        using var sha256 = SHA256.Create();");
+        sb.AppendLine("        var inputBytes = Encoding.UTF8.GetBytes($\"{key}:{count}:guid\");");
+        sb.AppendLine("        var hashBytes = sha256.ComputeHash(inputBytes);");
+        sb.AppendLine("        // Take first 16 bytes for GUID");
+        sb.AppendLine("        var guidBytes = new byte[16];");
+        sb.AppendLine("        Array.Copy(hashBytes, guidBytes, 16);");
+        sb.AppendLine("        var guid = new Guid(guidBytes);");
+        sb.AppendLine("        return guid.ToString(\"N\");");
         sb.AppendLine("    }");
         sb.AppendLine();
         sb.AppendLine("    private static string HtmlSafeId(string id)");

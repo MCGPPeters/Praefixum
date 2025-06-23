@@ -109,4 +109,108 @@ public class UniqueIdGeneratorBasicTests
             
         Assert.Equal(ids.Count, ids.Distinct().Count()); // All IDs should be unique
     }
+
+    // ==========================================
+    // TESTS USING ACTUAL [UniqueId] ATTRIBUTES
+    // These tests verify the source generator and interceptors work correctly
+    // ==========================================
+
+    [Fact]
+    public void ActualUniqueIdAttribute_GeneratesValidIds()
+    {
+        // Act - using actual [UniqueId] attribute
+        var div1 = TestHelpers.CreateDiv();
+        var div2 = TestHelpers.CreateDiv();
+        
+        // Assert
+        Assert.NotEqual(div1, div2);
+        Assert.Contains("id=\"", div1);
+        Assert.Contains("id=\"", div2);
+        
+        var id1 = ExtractId(div1);
+        var id2 = ExtractId(div2);
+        Assert.NotNull(id1);
+        Assert.NotNull(id2);
+        Assert.NotEqual(id1, id2);
+    }
+
+    [Fact]
+    public void ActualUniqueIdAttribute_WithExplicitValue_UsesProvidedValue()
+    {
+        // Act - using actual [UniqueId] attribute with explicit value
+        var result = TestHelpers.CreateDiv("my-explicit-id", "test content");
+        
+        // Assert
+        Assert.Equal("<div id=\"my-explicit-id\">test content</div>", result);
+    }
+
+    [Fact]
+    public void ActualUniqueIdAttribute_DifferentFormats_GenerateDifferentStyleIds()
+    {
+        // Act - using different UniqueId formats
+        var button = TestHelpers.CreateButtonWithGuid();
+        var input = TestHelpers.CreateInputWithHtmlId();
+        var span = TestHelpers.CreateSpanWithPrefix();
+        
+        // Assert
+        var buttonId = ExtractId(button);
+        var inputId = ExtractId(input);
+        var spanId = ExtractId(span);
+        
+        Assert.NotNull(buttonId);
+        Assert.NotNull(inputId);
+        Assert.NotNull(spanId);
+        
+        // GUID format should be 32 characters
+        Assert.Equal(32, buttonId.Length);
+        
+        // HTML ID should be shorter
+        Assert.True(inputId.Length < buttonId.Length);
+        
+        // Span should have prefix
+        Assert.StartsWith("span-", spanId);
+    }
+
+    [Fact]
+    public void ActualUniqueIdAttribute_MultipleParameters_GeneratesUniqueIds()
+    {
+        // Act - using method with multiple [UniqueId] parameters
+        var form = TestHelpers.CreateFormWithMultipleIds();
+        
+        // Assert
+        var idMatches = System.Text.RegularExpressions.Regex.Matches(form, @"id=""([^""]+)""");
+        Assert.Equal(4, idMatches.Count); // Form, name input, email input, submit button
+        
+        var ids = idMatches.Cast<System.Text.RegularExpressions.Match>()
+            .Select(m => m.Groups[1].Value)
+            .ToList();
+            
+        Assert.Equal(4, ids.Distinct().Count()); // All IDs should be unique
+    }
+
+    [Fact]
+    public void ActualUniqueIdAttribute_ComplexMethod_WorksCorrectly()
+    {
+        // Act - using method with mixed parameters (only one with [UniqueId])
+        var result = TestHelpers.CreateComplexElement("section", className: "highlight", content: "Important content");
+        
+        // Assert
+        Assert.StartsWith("<section", result);
+        Assert.Contains("class=\"highlight\"", result);
+        Assert.Contains("Important content", result);
+        Assert.Contains("id=\"", result);
+        
+        var id = ExtractId(result);
+        Assert.NotNull(id);
+        Assert.NotEmpty(id);
+    }
+
+    /// <summary>
+    /// Helper method to extract ID from HTML element
+    /// </summary>
+    private static string? ExtractId(string htmlElement)
+    {
+        var match = System.Text.RegularExpressions.Regex.Match(htmlElement, @"id=""([^""]+)""");
+        return match.Success ? match.Groups[1].Value : null;
+    }
 }
