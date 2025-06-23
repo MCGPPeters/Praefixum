@@ -16,31 +16,44 @@ public class UniqueIdAttribute : Attribute
 #### Constructor
 
 ```csharp
-public UniqueIdAttribute(UniqueIdFormat format, string prefix = "", string suffix = "")
+public UniqueIdAttribute(UniqueIdFormat format = UniqueIdFormat.Guid, string? prefix = null, bool deterministic = true)
 ```
 
 **Parameters:**
 
-- `format` (`UniqueIdFormat`): The format for the generated ID
-- `prefix` (`string`, optional): String to prepend to the generated ID
-- `suffix` (`string`, optional): String to append to the generated ID
+- `format` (`UniqueIdFormat`, optional): The format for the generated ID (default: `Guid`)
+- `prefix` (`string`, optional): String to prepend to the generated ID 
+- `deterministic` (`bool`, optional): Whether to generate deterministic IDs (default: `true`)
 
 #### Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
 | `Format` | `UniqueIdFormat` | The ID format to use |
-| `Prefix` | `string` | Prefix added to the generated ID |
-| `Suffix` | `string` | Suffix added to the generated ID |
+| `Prefix` | `string?` | Prefix added to the generated ID |
+| `Deterministic` | `bool` | Whether generation is deterministic |
 
 #### Example Usage
 
 ```csharp
 public static string CreateButton(
     string text,
-    [UniqueId(UniqueIdFormat.HtmlId, Prefix = "btn-")] string? id = null)
+    [UniqueId(UniqueIdFormat.HtmlId, prefix: "btn-")] string? id = null)
 {
-    return $"<button id=\"{id ?? UniqueId.HtmlId()}\">{text}</button>";
+    return $"<button id=\"{id}\">{text}</button>";
+}
+
+// Multiple parameters with different formats
+public static string CreateForm(
+    [UniqueId(UniqueIdFormat.HtmlId, prefix: "form-")] string? formId = null,
+    [UniqueId(UniqueIdFormat.HtmlId)] string? inputId = null,
+    [UniqueId(UniqueIdFormat.Guid)] string? buttonId = null)
+{
+    return $@"
+        <form id=""{formId}"">
+            <input id=""{inputId}"" type=""text"" />
+            <button id=""{buttonId}"">Submit</button>
+        </form>";
 }
 ```
 
@@ -52,102 +65,256 @@ Defines the available formats for generated unique IDs.
 
 ```csharp
 public enum UniqueIdFormat
+{
+    Guid,
+    HtmlId, 
+    Timestamp,
+    ShortHash
+}
 ```
 
 #### Values
 
 | Value | Example | Description |
 |-------|---------|-------------|
-| `HtmlId` | `a1B2cD` | 6-character HTML5-compliant ID starting with a letter |
-| `Hex8` | `a1b2c3d4` | 8-character lowercase hexadecimal |
-| `Hex16` | `a1b2c3d4e5f6g7h8` | 16-character lowercase hexadecimal |
-| `Hex32` | `a1b2c3d4e5f6g7h8...` | 32-character lowercase hexadecimal (full MD5) |
-| `Guid` | `12345678-1234-5678-9abc-123456789abc` | Standard GUID format with dashes |
-| `Base64` | `YWJjZGVm` | URL-safe Base64 encoding |
-| `AlphaOnly` | `ABCDEF` | Uppercase letters only (A-Z) |
-| `Slug` | `item-ABC123` | Slug format with "item-" prefix |
+| `Guid` | `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6` | 32-character deterministic GUID (no dashes) |
+| `HtmlId` | `xa1b2c3d4` | HTML5-compliant ID starting with a letter (8+ chars) |
+| `Timestamp` | `1735052327842` | Unix timestamp in milliseconds |
+| `ShortHash` | `YWJjZGVm` | 8-character Base64-encoded hash |
 
 #### Format Specifications
 
+##### Guid Format
+
+- **Length**: 32 characters
+- **Character set**: `0-9`, `a-f` (lowercase hexadecimal)
+- **Rules**: Deterministic based on call site and parameter index
+- **Collision resistance**: Extremely high (SHA256-based)
+- **Use case**: When maximum uniqueness is required
+
+```csharp
+[UniqueId(UniqueIdFormat.Guid)]
+// Generates: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+```
+
 ##### HtmlId Format
 
-- **Length**: 6 characters
-- **Character set**: `a-z`, `A-Z`, `0-9`
+- **Length**: 8+ characters (variable, starts with 'x' if needed)
+- **Character set**: `a-z`, `A-Z`, `0-9`, `-`, `_` (Base64-safe)
 - **Rules**: Always starts with a letter (HTML5 compliant)
-- **Collision resistance**: ~2.8 billion combinations
+- **Collision resistance**: High for typical usage
 - **Use case**: HTML element IDs, CSS selectors
 
 ```csharp
 [UniqueId(UniqueIdFormat.HtmlId)]
-// Generates: "a1B2cD", "x9Y8zW", etc.
+// Generates: "xa1b2c3d4", "abCdEfGh", etc.
 ```
 
-##### Hex8 Format
+##### Timestamp Format
+
+- **Length**: Variable (typically 13 digits)
+- **Character set**: `0-9` (digits only)
+- **Rules**: Unix timestamp in milliseconds
+- **Collision resistance**: Time-based (unique per millisecond)
+- **Use case**: Time-sensitive identifiers, logs, caching
+
+```csharp
+[UniqueId(UniqueIdFormat.Timestamp)]
+// Generates: "1735052327842", "1735052327843", etc.
+```
+
+##### ShortHash Format
 
 - **Length**: 8 characters
-- **Character set**: `0-9`, `a-f` (lowercase)
-- **Collision resistance**: ~4.3 billion combinations
-- **Use case**: Short hexadecimal identifiers
+- **Character set**: `A-Z`, `a-z`, `0-9`, `+`, `/` (Base64)
+- **Rules**: Base64-encoded SHA256 hash (first 8 characters)
+- **Collision resistance**: Good for most use cases
+- **Use case**: Compact identifiers, URL parameters
 
 ```csharp
-[UniqueId(UniqueIdFormat.Hex8)]
-// Generates: "a1b2c3d4", "f5e6d7c8", etc.
-```
-
-##### Hex16 Format
-
-- **Length**: 16 characters
-- **Character set**: `0-9`, `a-f` (lowercase)
-- **Collision resistance**: ~1.8 × 10^19 combinations
-- **Use case**: Medium-length unique identifiers
-
-```csharp
-[UniqueId(UniqueIdFormat.Hex16)]
-// Generates: "a1b2c3d4e5f6g7h8", etc.
-```
-
-##### Hex32 Format
-
-- **Length**: 32 characters
-- **Character set**: `0-9`, `a-f` (lowercase)
-- **Collision resistance**: Full MD5 hash (extremely low collision probability)
-- **Use case**: Maximum uniqueness requirements
-
-```csharp
-[UniqueId(UniqueIdFormat.Hex32)]
-// Generates: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6", etc.
-```
-
-##### Guid Format
-
-- **Length**: 36 characters (including dashes)
-- **Format**: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-- **Character set**: `0-9`, `a-f` (lowercase)
-- **Use case**: Standard GUID requirements
-
-```csharp
-[UniqueId(UniqueIdFormat.Guid)]
-// Generates: "12345678-1234-5678-9abc-123456789abc", etc.
-```
-
-##### Base64 Format
-
-- **Length**: Variable (typically 8-12 characters)
-- **Character set**: `A-Z`, `a-z`, `0-9`, `-`, `_` (URL-safe)
-- **Use case**: Compact encoding, URL parameters
-
-```csharp
-[UniqueId(UniqueIdFormat.Base64)]
+[UniqueId(UniqueIdFormat.ShortHash)]
 // Generates: "YWJjZGVm", "SGVsbG8", etc.
 ```
 
-##### AlphaOnly Format
+## Usage Patterns
 
-- **Length**: Variable (typically 6-8 characters)
-- **Character set**: `A-Z` (uppercase only)
-- **Use case**: When only letters are allowed
+### Single Parameter
 
 ```csharp
+public static string CreateDiv(
+    [UniqueId(UniqueIdFormat.HtmlId)] string? id = null,
+    string content = "")
+{
+    return $"<div id=\"{id}\">{content}</div>";
+}
+
+// Usage
+var div = CreateDiv(content: "Hello"); // <div id="xa1b2c3d4">Hello</div>
+```
+
+### Multiple Parameters
+
+**NEW in v2.1+**: Support for multiple `[UniqueId]` parameters in a single method.
+
+```csharp
+public static string CreateFormWithMultipleIds(
+    [UniqueId(UniqueIdFormat.HtmlId, prefix: "form-")] string? formId = null,
+    [UniqueId(UniqueIdFormat.HtmlId)] string? nameInputId = null,
+    [UniqueId(UniqueIdFormat.HtmlId)] string? emailInputId = null,
+    [UniqueId(UniqueIdFormat.Guid)] string? submitButtonId = null)
+{
+    return $@"
+        <form id=""{formId}"">
+            <input id=""{nameInputId}"" name=""name"" type=""text"" />
+            <input id=""{emailInputId}"" name=""email"" type=""email"" />
+            <button id=""{submitButtonId}"" type=""submit"">Submit</button>
+        </form>";
+}
+
+// Usage - all parameters get unique IDs automatically
+var form = CreateFormWithMultipleIds();
+// Generates: 
+// - formId: "form-xa1b2c3d4"
+// - nameInputId: "xe5f6g7h8"  
+// - emailInputId: "xi9j0k1l2"
+// - submitButtonId: "m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8"
+```
+
+### Mixed Parameters (Some with UniqueId, Some Without)
+
+```csharp
+public static string CreateComplexElement(
+    string tag,                                                    // Required parameter
+    [UniqueId(UniqueIdFormat.HtmlId)] string? id = null,          // UniqueId parameter
+    string? className = null,                                      // Optional parameter
+    string content = "")                                           // Optional parameter
+{
+    var classAttr = string.IsNullOrEmpty(className) ? "" : $" class=\"{className}\"";
+    return $"<{tag} id=\"{id}\"{classAttr}>{content}</{tag}>";
+}
+
+// Usage
+var element = CreateComplexElement("section", className: "highlight", content: "Important");
+// Generates: <section id="xa1b2c3d4" class="highlight">Important</section>
+```
+
+### Custom Prefixes
+
+```csharp
+public static string CreateWidget(
+    [UniqueId(UniqueIdFormat.HtmlId, prefix: "widget-")] string? id = null,
+    [UniqueId(UniqueIdFormat.Timestamp, prefix: "ts-")] string? timestampId = null)
+{
+    return $"<div id=\"{id}\" data-timestamp=\"{timestampId}\">Widget Content</div>";
+}
+
+// Usage  
+var widget = CreateWidget();
+// Generates: <div id="widget-xa1b2c3d4" data-timestamp="ts-1735052327842">Widget Content</div>
+```
+
+### Explicit Values (Overriding Generation)
+
+```csharp
+// When you provide explicit values, they are used instead of generating new ones
+var button1 = CreateButton("Click", id: "my-custom-id");      // Uses "my-custom-id"
+var button2 = CreateButton("Submit");                         // Generates unique ID
+
+var form = CreateFormWithMultipleIds(
+    formId: "contact-form",           // Explicit ID used
+    emailInputId: "user-email");      // Other parameters get generated IDs
+```
+
+## Return Type Support
+
+The source generator preserves all return types correctly:
+
+```csharp
+// String return type
+public static string GetElementId([UniqueId] string? id = null) 
+    => id ?? "default";
+
+// Int return type  
+public static int GetHashFromId([UniqueId(UniqueIdFormat.HtmlId)] string? id = null) 
+    => id?.GetHashCode() ?? 0;
+
+// Bool return type
+public static bool IsValidId([UniqueId(UniqueIdFormat.Guid)] string? id = null) 
+    => !string.IsNullOrEmpty(id);
+
+// Void return type
+public static void ProcessElement([UniqueId(prefix: "process-")] string? id = null) 
+    => Console.WriteLine($"Processing {id}");
+
+// Async return types
+public static async Task<string> CreateElementAsync([UniqueId] string? id = null) 
+{
+    await Task.Delay(1);
+    return $"<div id=\"{id}\"></div>";
+}
+
+// Generic return types
+public static List<T> CreateListWithId<T>(T[] items, [UniqueId] string? id = null) 
+{
+    Console.WriteLine($"List ID: {id}");
+    return new List<T>(items);
+}
+```
+
+## Advanced Scenarios
+
+### Deterministic vs Non-Deterministic
+
+```csharp
+// Deterministic (default) - same call site always generates same ID
+[UniqueId(UniqueIdFormat.HtmlId, deterministic: true)]  
+
+// Non-deterministic - includes additional entropy (not fully implemented)
+[UniqueId(UniqueIdFormat.HtmlId, deterministic: false)]
+```
+
+### Call Site Uniqueness
+
+Each call site gets unique IDs, even for the same method:
+
+```csharp
+var button1 = CreateButton("First");   // ID: xa1b2c3d4
+var button2 = CreateButton("Second");  // ID: xe5f6g7h8 (different call site)
+
+// Even in loops, each iteration gets the same ID (deterministic)
+for (int i = 0; i < 3; i++)
+{
+    var btn = CreateButton($"Button {i}"); // Same ID: xi9j0k1l2 for all iterations
+}
+```
+
+### Parameter Index Uniqueness
+
+For multiple parameters, each parameter gets a unique ID based on its position:
+
+```csharp
+var form = CreateFormWithMultipleIds(); 
+// formId (index 0):        "form-xa1b2c3d4"
+// nameInputId (index 1):   "xe5f6g7h8"  
+// emailInputId (index 2):  "xi9j0k1l2"
+// submitButtonId (index 3): "m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8"
+```
+
+## Error Handling
+
+### Compilation Errors
+
+The source generator will produce compilation errors for:
+
+- Methods with `[UniqueId]` parameters that don't have string types
+- Invalid format specifications
+- Circular dependencies in generated code
+
+### Runtime Behavior
+
+- If explicit values are provided for all `[UniqueId]` parameters, the original method is called directly
+- If any `[UniqueId]` parameters are null, the interceptor generates IDs and calls the original method
+- Generated IDs are always non-null and non-empty strings
 [UniqueId(UniqueIdFormat.AlphaOnly)]
 // Generates: "ABCDEF", "XYZABC", etc.
 ```

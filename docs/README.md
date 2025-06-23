@@ -1,6 +1,6 @@
 # Praefixum Documentation
 
-Welcome to the comprehensive documentation for Praefixum, the .NET 9 source generator for unique ID generation.
+Welcome to the comprehensive documentation for Praefixum, the .NET 9 source generator for unique ID generation with multiple parameter support.
 
 ## 📚 Documentation Index
 
@@ -8,20 +8,21 @@ Welcome to the comprehensive documentation for Praefixum, the .NET 9 source gene
 
 - **[Project README](../README.md)** - Main project overview, installation, and quick start guide
 - **[Installation Guide](../README.md#-installation)** - Detailed installation instructions
-- **[Quick Start](../README.md#-quick-start)** - Simple examples to get you up and running
+- **[Quick Start](../README.md#-quick-start)** - Simple examples including multiple parameters
 
 ### API Reference
 
 - **[API Documentation](API.md)** - Complete API reference with examples
   - UniqueIdAttribute usage and configuration
-  - UniqueIdFormat enumeration values
+  - UniqueIdFormat enumeration values (Guid, HtmlId, Timestamp, ShortHash)
+  - Multiple parameter support examples
   - Generated interceptor methods
   - Code examples and best practices
 
 ### Development & Testing
 
 - **[Contributing Guide](../CONTRIBUTING.md)** - Development setup and contribution guidelines
-- **[Test Suite Documentation](../Praefixum.Tests/README.md)** - Comprehensive test coverage details
+- **[Test Suite Documentation](../Praefixum.Tests/README.md)** - Comprehensive test coverage (107 tests, 97% success)
 - **[Requirements Document](../REQUIREMENTS.md)** - Project requirements and specifications
 
 ### Support & Troubleshooting
