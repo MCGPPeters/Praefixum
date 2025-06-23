@@ -13,11 +13,11 @@ Here are the steps to complete the publishing process for the UniqueIdGenerator 
 
 ## Pushing to GitHub
 
-1. Create a new repository on GitHub named "UniqueIdGenerator"
+1. Create a new repository on GitHub named "Praefixum"
 2. Add the GitHub repository as a remote:
 
 ```powershell
-git remote add origin https://github.com/yourusername/UniqueIdGenerator.git
+git remote add origin https://github.com/yourusername/Praefixum.git
 ```
 
 3. Push your code to GitHub:
@@ -39,7 +39,7 @@ git push --tags
 3. Push the package to NuGet.org:
 
 ```powershell
-dotnet nuget push UniqueIdGenerator.SourceGen\bin\Release\UniqueIdGenerator.1.0.1.nupkg --api-key YOUR_API_KEY --source https://api.nuget.org/v3/index.json
+dotnet nuget push UniqueIdGenerator.SourceGen\bin\Release\Praefixum.1.0.1.nupkg --api-key YOUR_API_KEY --source https://api.nuget.org/v3/index.json
 ```
 
 ## Configuring CI/CD with GitHub Actions

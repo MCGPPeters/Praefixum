@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace UniqueIdGenerator
+namespace Praefixum
 {
     [Generator]
     public class UniqueIdGenerator : IIncrementalGenerator
@@ -22,7 +22,7 @@ namespace UniqueIdGenerator
                 ctx.AddSource("UniqueIdAttribute.cs", SourceText.From(@"
 using System;
 
-namespace UniqueIdGenerator
+namespace Praefixum
 {
     /// <summary>
     /// Format options for UniqueId generation
@@ -104,7 +104,7 @@ namespace UniqueIdGenerator
                     return;
 
                 // Find the UniqueIdAttribute type
-                var attributeSymbol = compilation.GetTypeByMetadataName("UniqueIdGenerator.UniqueIdAttribute");
+                var attributeSymbol = compilation.GetTypeByMetadataName("Praefixum.UniqueIdAttribute");
                 if (attributeSymbol == null)
                     return;
 
@@ -124,7 +124,7 @@ namespace UniqueIdGenerator
                     // Check if parameter has UniqueIdAttribute
                     var uniqueIdAttribute = paramSymbol.GetAttributes()
                         .FirstOrDefault(a => a.AttributeClass != null && 
-                                            a.AttributeClass.ToDisplayString() == "UniqueIdGenerator.UniqueIdAttribute");
+                                            a.AttributeClass.ToDisplayString() == "Praefixum.UniqueIdAttribute");
                     
                     if (uniqueIdAttribute == null)
                         continue;

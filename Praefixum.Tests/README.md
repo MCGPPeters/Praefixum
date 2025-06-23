@@ -1,6 +1,6 @@
-# UniqueIdGenerator Test Suite
+# Praefixum Test Suite
 
-This project contains a comprehensive test suite for the UniqueIdGenerator source generator.
+This project contains a comprehensive test suite for the Praefixum source generator.
 
 ## Test Categories
 
@@ -50,7 +50,7 @@ dotnet test --filter "FullyQualifiedName~UniqueIdGeneratorEdgeCaseTests"
 The test suite uses a custom `SourceGeneratorVerifier` class which:
 
 1. Compiles test C# code using the Roslyn compiler
-2. Applies the UniqueIdGenerator source generator
+2. Applies the Praefixum source generator
 3. Gets the generated source code
 4. Verifies the generated code against expected patterns
 

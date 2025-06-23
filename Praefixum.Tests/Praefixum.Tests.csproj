@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UniqueIdGenerator.SourceGen\UniqueIdGenerator.SourceGen.csproj" 
+    <ProjectReference Include="..\Praefixum.SourceGen\Praefixum.SourceGen.csproj" 
                       OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="true" />
   </ItemGroup>

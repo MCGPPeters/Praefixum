@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Xunit;
 
-namespace UniqueIdGenerator.Tests
+namespace Praefixum.Tests
 {
     public class UniqueIdGeneratorIntegrationTests
     {
@@ -24,7 +24,7 @@ namespace UniqueIdGenerator.Tests
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace IntegrationTest
 {
@@ -96,7 +96,7 @@ namespace IntegrationTest
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace StaticTest
 {
@@ -141,7 +141,7 @@ namespace StaticTest
             // Arrange
             var generator = new UniqueIdGenerator();
             var source = @"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace OuterNamespace
 {
@@ -186,7 +186,7 @@ namespace OuterNamespace
                 .Select(i => $"public string GetHtmlId{i}([UniqueId(UniqueIdFormat.HtmlId)] string id = null) => id ?? GetHtmlId{i}_id_Id;"));
             
             var source = $@"
-using UniqueIdGenerator;
+using Praefixum;
 
 namespace HtmlIdTest
 {{
