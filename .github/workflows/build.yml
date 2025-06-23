@@ -38,13 +38,13 @@ jobs:
         echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj
       
     - name: Build
-      run: dotnet build --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
+      run: dotnet build UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
       
     - name: Test
-      run: dotnet test --configuration Release --no-build --verbosity normal
+      run: dotnet test UniqueIdGenerator.Tests/UniqueIdGenerator.Tests.csproj --configuration Release
       
     - name: Pack
       run: dotnet pack UniqueIdGenerator.SourceGen/UniqueIdGenerator.SourceGen.csproj --configuration Release --no-build --output nuget-packages /p:Version=${{ steps.gitversion.outputs.semVer }}
