@@ -1,4 +1,5 @@
 using System.Text;
+using Praefixum;
 
 namespace Praefixum.Tests;
 
@@ -155,5 +156,158 @@ public static class TestHelpers
         var submitButton = CreateButton(null, "Submit");
         
         return $"<form>{nameInput}{emailInput}{submitButton}</form>";
+    }
+
+    // ==========================================
+    // METHODS FOR TESTING RETURN TYPE PRESERVATION
+    // These methods have [UniqueId] parameters and different return types
+    // to test that the source generator preserves return types correctly
+    // ==========================================
+
+    /// <summary>
+    /// Method with string return type and UniqueId parameter
+    /// Tests that the generator preserves string return type
+    /// </summary>
+    public static string GetStringWithUniqueId([UniqueId] string? id = null)
+    {
+        return id ?? GenerateUniqueId();
+    }
+
+    /// <summary>
+    /// Method with int return type and UniqueId parameter
+    /// Tests that the generator preserves int return type
+    /// </summary>
+    public static int GetIntWithUniqueId([UniqueId] string? id = null)
+    {
+        if (int.TryParse(id, out var result))
+            return result;
+        return id?.GetHashCode() ?? new Random().Next(1000, 9999);
+    }
+
+    /// <summary>
+    /// Method with bool return type and UniqueId parameter
+    /// Tests that the generator preserves bool return type
+    /// </summary>
+    public static bool GetBoolWithUniqueId([UniqueId] string? id = null)
+    {
+        if (bool.TryParse(id, out var result))
+            return result;
+        return (id?.GetHashCode() ?? 0) % 2 == 0;
+    }
+
+    /// <summary>
+    /// Method with void return type and UniqueId parameter
+    /// Tests that the generator preserves void return type
+    /// </summary>
+    public static void DoSomethingWithUniqueId([UniqueId] string? id = null)
+    {
+        // Store the ID for later verification
+        LastGeneratedId = id ?? GenerateUniqueId();
+    }
+
+    /// <summary>
+    /// Method with double return type and UniqueId parameter
+    /// Tests that the generator preserves double return type
+    /// </summary>
+    public static double GetDoubleWithUniqueId([UniqueId] string? id = null)
+    {
+        if (double.TryParse(id, out var result))
+            return result;
+        return (id?.GetHashCode() ?? 0) * 0.001;
+    }
+
+    /// <summary>
+    /// Method with nullable string return type and UniqueId parameter
+    /// Tests that the generator preserves nullable return types
+    /// </summary>
+    public static string? GetNullableStringWithUniqueId([UniqueId] string? id = null)
+    {
+        return string.IsNullOrEmpty(id) ? null : id;
+    }
+
+    /// <summary>
+    /// Method with custom class return type and UniqueId parameter
+    /// Tests that the generator preserves custom return types
+    /// </summary>
+    public static TestResult GetCustomTypeWithUniqueId([UniqueId] string? id = null)
+    {
+        return new TestResult { Value = id ?? GenerateUniqueId() };
+    }
+
+    /// <summary>
+    /// Method with generic List return type and UniqueId parameter
+    /// Tests that the generator preserves generic return types
+    /// </summary>
+    public static List<string> GetListWithUniqueId([UniqueId] string? id = null)
+    {
+        return new List<string> { id ?? GenerateUniqueId() };
+    }
+
+    /// <summary>
+    /// Method with complex generic return type and UniqueId parameter
+    /// Tests that the generator preserves complex generic return types
+    /// </summary>
+    public static Dictionary<string, int> GetDictionaryWithUniqueId([UniqueId] string? id = null)
+    {
+        var key = id ?? GenerateUniqueId();
+        return new Dictionary<string, int> { { key, key.GetHashCode() } };
+    }
+
+    /// <summary>
+    /// Method with async Task return type and UniqueId parameter
+    /// Tests that the generator preserves async return types
+    /// </summary>
+    public static async Task<string> GetStringAsyncWithUniqueId([UniqueId] string? id = null)
+    {
+        await Task.Delay(1); // Simulate async work
+        return id ?? GenerateUniqueId();
+    }
+
+    /// <summary>
+    /// Method with ValueTask return type and UniqueId parameter
+    /// Tests that the generator preserves ValueTask return types
+    /// </summary>
+    public static async ValueTask<int> GetIntValueTaskWithUniqueId([UniqueId] string? id = null)
+    {
+        await Task.Delay(1); // Simulate async work
+        if (int.TryParse(id, out var result))
+            return result;
+        return id?.GetHashCode() ?? new Random().Next(1000, 9999);
+    }
+
+    /// <summary>
+    /// Method with nullable reference return type and UniqueId parameter
+    /// Tests that the generator preserves nullable reference return types
+    /// </summary>
+    public static TestResult? GetNullableCustomTypeWithUniqueId([UniqueId] string? id = null)
+    {
+        return string.IsNullOrEmpty(id) ? null : new TestResult { Value = id };
+    }
+
+    // ==========================================
+    // HELPER PROPERTIES AND CLASSES FOR TESTING
+    // ==========================================
+
+    /// <summary>
+    /// Property to store the last generated ID for void method testing
+    /// </summary>
+    public static string? LastGeneratedId { get; private set; }
+
+    /// <summary>
+    /// Test result class for testing custom return types
+    /// </summary>
+    public class TestResult
+    {
+        public string Value { get; set; } = "";
+        
+        public override bool Equals(object? obj)
+        {
+            return obj is TestResult other && Value == other.Value;
+        }
+        
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
     }
 }

@@ -60,7 +60,7 @@ public class UniqueIdGeneratorPerformanceTests
     }
 
     [Fact]
-    public void GenerateId_ConcurrentPerformance_HandlesParallelLoad()
+    public async void GenerateId_ConcurrentPerformance_HandlesParallelLoad()
     {
         // Arrange
         const int concurrentTasks = 20;
@@ -82,7 +82,7 @@ public class UniqueIdGeneratorPerformanceTests
             }))
             .ToArray();
             
-        var results = Task.WhenAll(tasks).Result;
+        var results = await Task.WhenAll(tasks);
         stopwatch.Stop();
         
         // Assert

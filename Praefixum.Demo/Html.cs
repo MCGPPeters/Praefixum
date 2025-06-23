@@ -1,4 +1,6 @@
+#nullable enable
 using Praefixum;
+
 public static class Html
 {
     public static string H1(string content, [UniqueId(UniqueIdFormat.HtmlId)] string? id = null) =>
@@ -9,4 +11,8 @@ public static class Html
 
     public static string Button(string content, [UniqueId(UniqueIdFormat.Guid)] string? id = null) =>
         $"<button id=\"{id}\">{content}</button>";
+
+    // Test method with different return type
+    public static int GetElementCount(string selector, [UniqueId(UniqueIdFormat.HtmlId)] string? id = null) =>
+        selector.Length + (id?.Length ?? 0);
 }
