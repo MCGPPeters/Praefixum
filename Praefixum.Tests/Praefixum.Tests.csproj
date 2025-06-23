@@ -5,9 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <LangVersion>preview</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
-    <LangVersion>latest</LangVersion>
+
+        <InterceptorsNamespaces>$(InterceptorsNamespaces);Praefixum</InterceptorsNamespaces>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,7 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Praefixum\Praefixum.csproj" 
                       OutputItemType="Analyzer" 
-                      ReferenceOutputAssembly="true" />
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
