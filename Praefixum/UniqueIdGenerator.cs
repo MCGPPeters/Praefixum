@@ -10,6 +10,15 @@ using System.Text;
 
 namespace Praefixum;
 
+// Enum used by the source generator internally
+internal enum UniqueIdFormat
+{
+    Guid,
+    HtmlId,
+    Timestamp,
+    ShortHash
+}
+
 [Generator]
 public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 {
@@ -17,6 +26,7 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
     {        // Register the attribute source first
         context.RegisterPostInitializationOutput(ctx =>
         {            ctx.AddSource("UniqueIdAttribute.g.cs", SourceText.From("""
+                #nullable enable
                 namespace Praefixum
                 {
                     [System.AttributeUsage(System.AttributeTargets.Parameter)]
@@ -295,13 +305,11 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         sb.AppendLine("            return \"x\" + id;");
         sb.AppendLine("        return id;");        sb.AppendLine("    }");
         sb.AppendLine("}");
-        sb.AppendLine("}");
-
-        return sb.ToString();
+        sb.AppendLine("}");        return sb.ToString();
     }
 }
 
-public record MethodCallInfo(
+internal record MethodCallInfo(
     string ContainingType,
     string MethodName,
     string ReturnType,
@@ -310,7 +318,7 @@ public record MethodCallInfo(
     List<ParameterInfo> UniqueIdParameters
 );
 
-public record ParameterInfo(
+internal record ParameterInfo(
     int Index,
     UniqueIdFormat Format,
     string? Prefix,
