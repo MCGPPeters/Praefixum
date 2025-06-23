@@ -2,6 +2,15 @@
 
 Here are the steps to complete the publishing process for the UniqueIdGenerator source generator.
 
+## Current Status
+
+- ✅ Project setup with proper NuGet package metadata
+- ✅ Source code fully functional with warnings fixed
+- ✅ NuGet package generation working correctly
+- ✅ Documentation, licenses, and markdown files completed
+- ✅ Git repository initialized with tags
+- ✅ GitHub Actions CI/CD workflow configured
+
 ## Pushing to GitHub
 
 1. Create a new repository on GitHub named "UniqueIdGenerator"
@@ -17,10 +26,10 @@ git remote add origin https://github.com/yourusername/UniqueIdGenerator.git
 git push -u origin master
 ```
 
-4. Push the tag to GitHub:
+4. Push the tags to GitHub:
 
 ```powershell
-git push origin v1.0.0
+git push --tags
 ```
 
 ## Publishing to NuGet.org
@@ -30,7 +39,7 @@ git push origin v1.0.0
 3. Push the package to NuGet.org:
 
 ```powershell
-dotnet nuget push UniqueIdGenerator.SourceGen\bin\Release\UniqueIdGenerator.1.0.0.nupkg --api-key YOUR_API_KEY --source https://api.nuget.org/v3/index.json
+dotnet nuget push UniqueIdGenerator.SourceGen\bin\Release\UniqueIdGenerator.1.0.1.nupkg --api-key YOUR_API_KEY --source https://api.nuget.org/v3/index.json
 ```
 
 ## Configuring CI/CD with GitHub Actions
@@ -50,11 +59,7 @@ To make it work correctly:
    - Name: `NUGET_API_KEY`
    - Value: Your NuGet API key
 
-2. Push a tag to trigger a release:
-```powershell
-git tag -a v1.0.1 -m "Fix NuGet packaging"
-git push origin v1.0.1
-```
+2. The CI/CD pipeline will automatically trigger when you push the repository with its tags.
 
 ## Future Releases
 
