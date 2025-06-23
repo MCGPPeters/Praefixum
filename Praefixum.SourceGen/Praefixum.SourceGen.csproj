@@ -30,7 +30,7 @@
     <PackageReleaseNotes>Fixed nullability warnings and improved NuGet package.</PackageReleaseNotes>
     <Copyright>Copyright © 2025</Copyright>
     <PackageTags>source-generator;roslyn;unique-id;guid;identifier</PackageTags>
-    <PackageIcon>icon.png</PackageIcon>
+    <!-- <PackageIcon>icon.png</PackageIcon> -->
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <DevelopmentDependency>true</DevelopmentDependency>
   </PropertyGroup>
