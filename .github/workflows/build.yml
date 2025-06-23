@@ -55,6 +55,18 @@ jobs:
         name: nuget-packages
         path: nuget-packages/*.nupkg
         
+    - name: Verify NuGet package
+      run: |
+        echo "Verifying NuGet package..."
+        dotnet tool install --global dotnet-validate
+        packagePath=$(ls -1 nuget-packages/*.nupkg | head -1)
+        echo "Validating package: $packagePath"
+        validate package $packagePath
+        
     - name: Publish to NuGet
       if: startsWith(github.ref, 'refs/tags/v')
-      run: dotnet nuget push nuget-packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: |
+        echo "Publishing NuGet package with version ${{ steps.gitversion.outputs.semVer }}"
+        ls -la nuget-packages/
+        dotnet nuget push nuget-packages/*.nupkg --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols --verbosity detailed
+      continue-on-error: false
