@@ -590,9 +590,7 @@ public class UniqueIdFormatTests
                 $"Prefixed: '{prefixedId}' from '{prefixedSpan}', " +
                 $"Timestamp: '{timestampId}' from '{timestampSection}', " +
                 $"ShortHash: '{shortHashId}' from '{shortHashArticle}'");
-        }
-
-        Assert.True(true, "All methods generated valid HTML with IDs");
+        }        Assert.True(true, "All methods generated valid HTML with IDs");
     }
 
     /// <summary>
