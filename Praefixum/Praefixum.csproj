@@ -11,6 +11,7 @@
     <!-- Disable nullable warnings -->
     <NoWarn>CS8602</NoWarn>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);Praefixum</InterceptorsNamespaces>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
@@ -52,9 +53,14 @@
   <ItemGroup>
     <!-- Include the source generator as an analyzer -->
     <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers\dotnet\cs\$(AssemblyName).dll" Visible="false" />
-    
-    <!-- Include the assembly in lib folder for attributes -->
-    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="lib\netstandard2.0\$(AssemblyName).dll" Visible="false" />
+
+    <!-- Include the attributes assembly in lib folder -->
+    <None Include="..\Praefixum.Attributes\bin\$(Configuration)\netstandard2.0\Praefixum.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0\Praefixum.Attributes.dll" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Reference attribute definitions for compile-time use -->
+    <ProjectReference Include="..\Praefixum.Attributes\Praefixum.Attributes.csproj" PrivateAssets="all" />
   </ItemGroup>
   <!-- Build targets to ensure proper analyzer reference -->
   <ItemGroup>

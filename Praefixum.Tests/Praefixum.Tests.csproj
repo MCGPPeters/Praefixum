@@ -34,9 +34,10 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\Praefixum\Praefixum.csproj" 
-                      OutputItemType="Analyzer" 
+    <ProjectReference Include="..\Praefixum\Praefixum.csproj"
+                      OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Praefixum.Attributes\Praefixum.Attributes.csproj" />
   </ItemGroup>
 
 </Project>
