@@ -583,7 +583,7 @@ public class UniqueIdFormatTests
         // Fail with diagnostic info if any are null
         if (nullCount > 0)
         {
-            Assert.True(false, 
+            Assert.Fail( 
                 $"Found {nullCount} null IDs out of 5. " +
                 $"GUID: '{guidId}' from '{guidButton}', " +
                 $"HTML: '{htmlId}' from '{htmlInput}', " +

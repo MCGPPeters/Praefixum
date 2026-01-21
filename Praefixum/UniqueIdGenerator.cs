@@ -9,22 +9,19 @@ using System.Text;
 
 namespace Praefixum;
 
-// Enum used by the source generator internally
-internal enum UniqueIdFormat
-{
-    Guid,
-    HtmlId,
-    Timestamp,
-    ShortHash
-}
-
 [Generator]
 public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
-    {        // Register the attribute source first
-        context.RegisterPostInitializationOutput(ctx =>
-        {            ctx.AddSource("UniqueIdAttribute.g.cs", SourceText.From("""
+    {        // Register the attribute source if not already provided by a referenced assembly
+        context.RegisterSourceOutput(context.CompilationProvider, static (ctx, compilation) =>
+        {
+            var hasAttribute = HasType(compilation, "Praefixum", "UniqueIdAttribute");
+            var hasFormat = HasType(compilation, "Praefixum", "UniqueIdFormat");
+            if (hasAttribute || hasFormat)
+                return;
+
+            ctx.AddSource("UniqueIdAttribute.g.cs", SourceText.From("""
                 #nullable enable
                 namespace Praefixum
                 {
@@ -125,6 +122,26 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         if (endIndex == -1) return "unknown_data";
         
         return attributeSyntax.Substring(startIndex + 1, endIndex - startIndex - 1);
+    }
+
+    private static bool HasType(Compilation compilation, string @namespace, string typeName)
+    {
+        var metadataName = $"{@namespace}.{typeName}";
+        if (compilation.GetTypeByMetadataName(metadataName) is not null)
+            return true;
+
+        foreach (var reference in compilation.References)
+        {
+            if (compilation.GetAssemblyOrModuleSymbol(reference) is IAssemblySymbol assemblySymbol &&
+                assemblySymbol.GetTypeByMetadataName(metadataName) is not null)
+            {
+                return true;
+            }
+        }
+
+        return compilation.GetSymbolsWithName(typeName, SymbolFilter.Type)
+            .OfType<INamedTypeSymbol>()
+            .Any(symbol => symbol.ContainingNamespace.ToDisplayString() == @namespace);
     }
 
     private static UniqueIdFormat GetUniqueIdFormat(IParameterSymbol parameter)

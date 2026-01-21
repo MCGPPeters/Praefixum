@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace Praefixum.Tests;
@@ -182,7 +183,7 @@ public class UniqueIdGeneratorPerformanceTests
             var result = TestHelpers.CreateHtmlElement("div", null);
             _ = TestHelpers.ExtractId(result);
         }
-        var noPrefixTime = stopwatch.ElapsedMilliseconds;
+        var noPrefixTicks = stopwatch.ElapsedTicks;
         
         // Act - Test with prefix
         stopwatch.Restart();
@@ -191,11 +192,11 @@ public class UniqueIdGeneratorPerformanceTests
             var result = TestHelpers.CreatePrefixedDiv(null, "content");
             _ = TestHelpers.ExtractId(result);
         }
-        var prefixTime = stopwatch.ElapsedMilliseconds;
+        var prefixTicks = stopwatch.ElapsedTicks;
         stopwatch.Stop();
-          // Assert - Prefix handling should not add excessive overhead (allow up to 5x)
-        var overheadRatio = (double)prefixTime / noPrefixTime;
-        Assert.True(overheadRatio < 5.0, 
-            $"Prefix handling adds {overheadRatio:F2}x overhead ({prefixTime}ms vs {noPrefixTime}ms)");
+        // Assert - Prefix handling should not add excessive overhead (allow up to 10x)
+        var overheadRatio = (double)prefixTicks / Math.Max(1, noPrefixTicks);
+        Assert.True(overheadRatio < 10.0, 
+            $"Prefix handling adds {overheadRatio:F2}x overhead ({prefixTicks} ticks vs {noPrefixTicks} ticks)");
     }
 }

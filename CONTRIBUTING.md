@@ -186,7 +186,7 @@ Enable generated file output in your test project:
 </PropertyGroup>
 ```
 
-Generated files will be in `obj/Debug/net9.0/Generated/`
+Generated files will be in `obj/Debug/net10.0/Generated/`
 
 ### Debugging Tips
 

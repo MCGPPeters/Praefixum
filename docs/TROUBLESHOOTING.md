@@ -19,7 +19,7 @@ This guide helps resolve common issues when using Praefixum.
    <TargetFramework>net8.0</TargetFramework>
    
    <!-- ✅ Correct -->
-   <TargetFramework>net9.0</TargetFramework>
+   <TargetFramework>net10.0</TargetFramework>
    ```
 
 2. **Missing language version**
@@ -77,7 +77,7 @@ CS9236: Cannot intercept: the indicated location does not exist
    ```xml
    <Project Sdk="Microsoft.NET.Sdk">
      <PropertyGroup>
-       <TargetFramework>net9.0</TargetFramework>
+       <TargetFramework>net10.0</TargetFramework>
        <LangVersion>latest</LangVersion>
      </PropertyGroup>
    </Project>
@@ -176,7 +176,7 @@ public void Method([UniqueId(UniqueIdFormat.HtmlId)] string id)
 </PropertyGroup>
 ```
 
-Generated files will be in: `obj/Debug/net9.0/Generated/Praefixum/`
+Generated files will be in: `obj/Debug/net10.0/Generated/Praefixum/`
 
 ### Issue: NuGet package not working
 
@@ -195,7 +195,7 @@ Generated files will be in: `obj/Debug/net9.0/Generated/Praefixum/`
 2. **Verify project configuration**:
    ```xml
    <PropertyGroup>
-       <TargetFramework>net9.0</TargetFramework>
+       <TargetFramework>net10.0</TargetFramework>
        <LangVersion>latest</LangVersion>
    </PropertyGroup>
    ```
@@ -228,7 +228,7 @@ To see what the source generator is creating:
 
 3. **Check the generated files**:
    ```
-   obj/Debug/net9.0/Generated/Praefixum/Praefixum.PraefixumSourceGenerator/
+   obj/Debug/net10.0/Generated/Praefixum/Praefixum.PraefixumSourceGenerator/
    ├── UniqueIdAttribute.g.cs
    └── UniqueIdInterceptors.g.cs
    ```

@@ -45,7 +45,7 @@
     <None Include="..\assets\icon.png" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>  <!-- Source generator specific settings -->
   <PropertyGroup>
-    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup><!-- Package the source generator and attribute assembly -->
