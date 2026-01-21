@@ -4,16 +4,16 @@
 [![NuGet](https://img.shields.io/nuget/v/Praefixum.svg)](https://www.nuget.org/packages/Praefixum)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Praefixum** is a powerful .NET 9 source generator that provides compile-time unique ID generation using interceptors. It enables deterministic and human-friendly unique identifiers to be automatically generated for method parameters marked with the `[UniqueId]` attribute.
+**Praefixum** is a .NET 10 source generator that emits interceptors for automatic unique ID generation. It enables deterministic, human-friendly identifiers to be generated for method parameters marked with the `[UniqueId]` attribute.
 
 ## 🚀 Features
 
-- **Compile-time ID generation** - No runtime overhead
-- **Deterministic** - Same code location always generates the same ID  
+- **Build-time interceptors** - Generated code handles IDs without manual wiring
+- **Deterministic by call site** - Same code location generates stable IDs  
 - **Multiple parameter support** - Handle multiple `[UniqueId]` parameters in a single method
 - **Multiple formats** - Support for HTML IDs, GUIDs, timestamps, and hash-based IDs
 - **Prefix support** - Add custom prefixes to generated IDs
-- **Interceptor-based** - Uses .NET 9's interceptor feature for seamless integration
+- **Interceptor-based** - Uses .NET 10 preview interceptors for seamless integration
 - **Thread-safe** - Generated IDs are constants, no concurrency issues
 - **Zero dependencies** - Pure source generator implementation
 
@@ -49,14 +49,14 @@ public static string CreateButton(
 ### 2. Use the method
 
 ```csharp
-// Each call generates a unique ID at compile time
+// Each call generates a unique ID via the generated interceptor
 var button1 = CreateButton("Click me");     // <button id="a1b2c3d4">Click me</button>
 var button2 = CreateButton("Submit");       // <button id="x9y8z1w2">Submit</button>
 ```
 
 ### 3. Compilation magic ✨
 
-The source generator automatically intercepts calls to methods with `[UniqueId]` parameters and replaces null values with compile-time generated unique IDs based on the call location.
+The source generator emits interceptors that replace null `[UniqueId]` parameters with generated IDs based on the call location.
 
 ## 🎨 Supported ID Formats
 
@@ -136,10 +136,9 @@ public static string Widget(
 
 1. **Attribute Detection**: The source generator scans for methods with `[UniqueId]` parameters
 2. **Call Site Analysis**: Identifies calls to methods with `[UniqueId]` parameters
-3. **Interceptor Generation**: Creates interceptor methods for each call site using .NET 9's interceptor feature
-4. **Hash Generation**: Creates a deterministic hash from file path, line number, column, and parameter index
-5. **Unique ID Generation**: Formats the hash according to the specified format for each parameter
-6. **Code Replacement**: The interceptor handles null parameters by generating IDs, then calls the original method
+3. **Interceptor Generation**: Creates interceptor methods for each call site using .NET 10 preview interceptors
+4. **ID Generation**: Generates IDs from call-site location data at build time
+5. **Invocation**: The interceptor fills null parameters with literal IDs and calls the original method
 
 ### Generated Code Example
 
@@ -178,7 +177,7 @@ public static string CreateFormWithMultipleIds_0(
 
 ## 🧪 Testing
 
-The project includes a comprehensive test suite with 100+ tests covering:
+The project includes a comprehensive test suite covering:
 
 - **Basic functionality** - Core ID generation and validation  
 - **Multiple parameter support** - Methods with multiple `[UniqueId]` parameters
@@ -193,18 +192,20 @@ Run tests with:
 dotnet test
 ```
 
-### Test Results (Latest)
-
-- **✅ 104 of 107 tests passing**
-- **✅ All core functionality working**  
-- **✅ Multiple parameter support verified**
-- **⚠️ 3 edge-case tests failing** (uniqueness guarantees and performance thresholds)
-
 ## 🔧 Requirements
 
-- **.NET 9.0 or later** (for interceptor support)
-- **C# 12.0 or later**
-- **Visual Studio 2022 17.8+** or **Rider 2023.3+**
+- **.NET 10.0 or later** (for interceptor support)
+- **C# preview** (interceptors are preview)
+- **EnablePreviewFeatures** and **InterceptorsNamespaces** enabled in your project
+
+```xml
+<PropertyGroup>
+  <TargetFramework>net10.0</TargetFramework>
+  <LangVersion>preview</LangVersion>
+  <EnablePreviewFeatures>true</EnablePreviewFeatures>
+  <InterceptorsNamespaces>$(InterceptorsNamespaces);Praefixum</InterceptorsNamespaces>
+</PropertyGroup>
+```
 
 ## 🤝 Contributing
 
@@ -238,7 +239,7 @@ Praefixum/
 
 ## 📈 Performance
 
-- **Zero runtime overhead** - All IDs are compile-time constants
+- **No runtime ID generation** - IDs are compile-time literals in generated code
 - **Fast compilation** - Minimal impact on build time
 - **Memory efficient** - No runtime allocations for ID generation
 - **Thread-safe** - Generated constants are inherently thread-safe
@@ -248,18 +249,13 @@ Praefixum/
 ### Common Issues
 
 **Q: IDs are not being generated**
-A: Ensure you're using .NET 9 and have enabled interceptors in your project.
+A: Ensure you're using .NET 10 and have enabled preview features and interceptors in your project.
 
 **Q: Duplicate ID errors**
 A: This indicates the same call site is generating multiple IDs. Check your code structure.
 
 **Q: Build errors with interceptors**
-A: Verify your project targets .NET 9 and uses the latest C# language version.
-
-### Diagnostic Codes
-
-- `UID001`: Duplicate ID detected
-- `UID002`: Parameter marked with `[UniqueId]` is not assigned a generator
+A: Verify your project targets .NET 10, `LangVersion` is `preview`, and preview features are enabled.
 
 ## 📄 License
 
@@ -268,7 +264,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - Built with [Roslyn](https://github.com/dotnet/roslyn) source generators
-- Uses .NET 9's [interceptor feature](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-12.0/interceptors)
+- Uses .NET 10 preview [interceptor feature](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-12.0/interceptors)
 - Inspired by compile-time code generation patterns
 
 Made with ❤️ for the .NET community

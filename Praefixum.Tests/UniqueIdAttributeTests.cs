@@ -234,7 +234,7 @@ public class UniqueIdAttributeTests
     [InlineData(5)]
     [InlineData(10)]
     [InlineData(20)]
-    public void MultipleCallsWithUniqueId_GenerateUniqueIds(int count)
+    public void MultipleCallsWithUniqueId_AreDeterministic(int count)
     {
         // Act
         var ids = new HashSet<string>();
@@ -247,7 +247,7 @@ public class UniqueIdAttributeTests
         }
 
         // Assert
-        Assert.Equal(count, ids.Count); // All IDs should be unique
+        Assert.Single(ids);
     }
 
     [Fact]

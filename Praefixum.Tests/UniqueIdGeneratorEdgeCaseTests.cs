@@ -64,7 +64,7 @@ public class UniqueIdGeneratorEdgeCaseTests
     }
 
     [Fact]
-    public void GenerateId_LargeNumberOfCalls_MaintainsUniqueness()
+    public void GenerateId_LargeNumberOfCalls_IsDeterministicPerCallSite()
     {
         // Arrange
         const int largeCount = 1000;
@@ -74,7 +74,7 @@ public class UniqueIdGeneratorEdgeCaseTests
         
         // Assert
         Assert.Equal(largeCount, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique
+        Assert.Single(ids.Distinct());
         Assert.True(ids.All(id => TestHelpers.IsValidHtmlId(id)));
     }
 
@@ -144,7 +144,7 @@ public class UniqueIdGeneratorEdgeCaseTests
     }
 
     [Fact]
-    public async void GenerateId_ThreadSafety_ProducesUniqueIdsAcrossThreads()
+    public async void GenerateId_ThreadSafety_ProducesDeterministicIdsAcrossThreads()
     {
         // Arrange
         const int threadsCount = 10;
@@ -176,6 +176,6 @@ public class UniqueIdGeneratorEdgeCaseTests
         // Assert
         var expectedCount = threadsCount * idsPerThread;
         Assert.Equal(expectedCount, allIds.Count);
-        Assert.Equal(allIds.Count, allIds.Distinct().Count()); // All should be unique across threads
+        Assert.Single(allIds.Distinct());
     }
 }

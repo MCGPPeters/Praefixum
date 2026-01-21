@@ -40,7 +40,7 @@ public class UniqueIdFormatTests
     [InlineData(10)]
     [InlineData(50)]
     [InlineData(100)]
-    public void MultipleGuidGeneration_ProducesUniqueIds(int count)
+    public void MultipleGuidGeneration_IsDeterministicPerCallSite(int count)
     {
         // Arrange & Act
         var ids = new List<string>();
@@ -53,14 +53,14 @@ public class UniqueIdFormatTests
         
         // Assert
         Assert.Equal(count, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique
+        Assert.Single(ids.Distinct());
     }
 
     [Theory]
     [InlineData(10)]
     [InlineData(50)]
     [InlineData(100)]
-    public void MultipleHtmlIdGeneration_ProducesUniqueIds(int count)
+    public void MultipleHtmlIdGeneration_IsDeterministicPerCallSite(int count)
     {
         // Arrange & Act
         var ids = new List<string>();
@@ -73,7 +73,7 @@ public class UniqueIdFormatTests
         
         // Assert
         Assert.Equal(count, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique
+        Assert.Single(ids.Distinct());
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class UniqueIdFormatTests
     }
 
     [Fact]
-    public void MultiplePrefixedIds_AreUnique()
+    public void MultiplePrefixedIds_AreDeterministicPerCallSite()
     {
         // Arrange & Act
         var ids = new List<string>();
@@ -104,7 +104,7 @@ public class UniqueIdFormatTests
         // Assert
         Assert.Equal(10, ids.Count);
         Assert.True(ids.All(id => id.StartsWith("div-")));
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique
+        Assert.Single(ids.Distinct());
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class UniqueIdFormatTests
         Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique
         Assert.True(ids.All(id => TestHelpers.IsValidHtmlId(id)));
     }    [Fact]
-    public async Task ConcurrentIdGeneration_ProducesUniqueIds()
+    public async Task ConcurrentIdGeneration_IsDeterministicPerCallSite()
     {
         // Arrange & Act
         var tasks = Enumerable.Range(0, 100)
@@ -140,11 +140,11 @@ public class UniqueIdFormatTests
         
         // Assert
         Assert.Equal(100, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique even when generated concurrently
+        Assert.Single(ids.Distinct());
     }
 
     [Fact]
-    public void CrossFormat_IdGeneration_ProducesUniqueIds()
+    public void CrossFormat_IdGeneration_ProducesStableIds()
     {
         // Arrange & Act - Mix different format generators
         var guidIds = new List<string>();
@@ -171,14 +171,12 @@ public class UniqueIdFormatTests
         Assert.Equal(20, htmlIds.Count);
         Assert.Equal(20, prefixedIds.Count);
         
-        // All IDs within each format should be unique
-        Assert.Equal(guidIds.Count, guidIds.Distinct().Count());
-        Assert.Equal(htmlIds.Count, htmlIds.Distinct().Count());
-        Assert.Equal(prefixedIds.Count, prefixedIds.Distinct().Count());
-        
-        // Cross-format uniqueness (no overlap between different formats)
+        Assert.Single(guidIds.Distinct());
+        Assert.Single(htmlIds.Distinct());
+        Assert.Single(prefixedIds.Distinct());
+
         var allIds = guidIds.Concat(htmlIds).Concat(prefixedIds).ToList();
-        Assert.Equal(allIds.Count, allIds.Distinct().Count());
+        Assert.Equal(3, allIds.Distinct().Count());
     }
 
     [Fact]
@@ -215,7 +213,7 @@ public class UniqueIdFormatTests
     [Theory]
     [InlineData(1000)]
     [InlineData(5000)]
-    public void HighVolume_IdGeneration_MaintainsUniqueness(int count)
+    public void HighVolume_IdGeneration_IsDeterministic(int count)
     {
         // Arrange & Act
         var ids = new HashSet<string>();
@@ -236,8 +234,8 @@ public class UniqueIdFormatTests
         }
         
         // Assert
-        Assert.Equal(0, duplicateCount); // No duplicates should occur
-        Assert.Equal(count, ids.Count);
+        Assert.Equal(count - 1, duplicateCount);
+        Assert.Single(ids);
     }
 
     [Fact]
@@ -259,7 +257,7 @@ public class UniqueIdFormatTests
         
         // Assert
         Assert.Equal(4, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique
+        Assert.Equal(ids.Count, ids.Distinct().Count());
         Assert.All(ids, id => Assert.True(TestHelpers.IsValidHtmlId(id)));
         
         // Verify format-specific requirements
@@ -288,7 +286,6 @@ public class UniqueIdFormatTests
         Assert.True(nullId!.Length > 0);
         Assert.True(whitespaceId!.Length > 0);
         
-        // They should all be different
         Assert.NotEqual(emptyId, nullId);
         Assert.NotEqual(nullId, whitespaceId);
         Assert.NotEqual(emptyId, whitespaceId);
@@ -363,7 +360,7 @@ public class UniqueIdFormatTests
         
         var idList = allIds.ToList();
         Assert.Equal(threadCount * idsPerThread, idList.Count);
-        Assert.Equal(idList.Count, idList.Distinct().Count()); // All should be unique
+        Assert.Single(idList.Distinct());
     }
 
     // ==========================================
@@ -436,7 +433,6 @@ public class UniqueIdFormatTests
     {
         // Act - using actual [UniqueId(UniqueIdFormat.Timestamp)]
         var section1 = TestHelpers.CreateSectionWithTimestamp();
-        Thread.Sleep(1); // Ensure different timestamps
         var section2 = TestHelpers.CreateSectionWithTimestamp();
 
         // Assert
@@ -445,7 +441,7 @@ public class UniqueIdFormatTests
 
         Assert.NotNull(id1);
         Assert.NotNull(id2);
-        Assert.NotEqual(id1, id2); // Should be different due to different timestamps
+        Assert.NotEqual(id1, id2);
     }
 
     [Fact]
@@ -467,7 +463,7 @@ public class UniqueIdFormatTests
     }    [Theory]
     [InlineData(25)]
     [InlineData(50)]
-    public void ActualMultipleFormats_ProduceUniqueIds(int count)
+    public void ActualMultipleFormats_ProduceStableIds(int count)
     {
         // Act - using all different actual [UniqueId] formats
         var allIds = new List<string>();
@@ -496,7 +492,7 @@ public class UniqueIdFormatTests
 
         // Assert - We should have gotten IDs from all method calls
         Assert.Equal(count * 5, allIds.Count);
-        Assert.Equal(allIds.Count, allIds.Distinct().Count()); // All should be unique
+        Assert.Equal(5, allIds.Distinct().Count());
     }
 
     [Fact]
@@ -540,7 +536,7 @@ public class UniqueIdFormatTests
     }
 
     [Fact]
-    public async Task ActualAsyncMethod_GeneratesUniqueIds()
+    public async Task ActualAsyncMethod_GeneratesDeterministicIds()
     {
         // Act - using actual async method with [UniqueId]
         var element1 = await TestHelpers.CreateElementAsync();

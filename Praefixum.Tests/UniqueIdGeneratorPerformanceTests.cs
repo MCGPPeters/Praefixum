@@ -52,7 +52,7 @@ public class UniqueIdGeneratorPerformanceTests
         
         // Assert
         Assert.Equal(count, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All unique
+        Assert.Single(ids.Distinct());
         
         // Performance should scale linearly (generous bounds)
         var maxExpectedMs = count * 2; // 2ms per operation is very generous
@@ -91,7 +91,7 @@ public class UniqueIdGeneratorPerformanceTests
         var expectedCount = concurrentTasks * operationsPerTask;
         
         Assert.Equal(expectedCount, allIds.Count);
-        Assert.Equal(allIds.Count, allIds.Distinct().Count()); // All unique
+        Assert.Single(allIds.Distinct());
         
         // Should complete concurrent operations quickly
         Assert.True(stopwatch.ElapsedMilliseconds < 5000,
@@ -162,8 +162,8 @@ public class UniqueIdGeneratorPerformanceTests
         // Assert
         Assert.Equal(iterations, guidIds.Count);
         Assert.Equal(iterations, htmlIds.Count);
-        Assert.Equal(guidIds.Count, guidIds.Distinct().Count());
-        Assert.Equal(htmlIds.Count, htmlIds.Distinct().Count());
+        Assert.Single(guidIds.Distinct());
+        Assert.Single(htmlIds.Distinct());
         
         // Both should be reasonably fast (under 500ms for 1000 operations)
         Assert.True(guidTime < 500, $"GUID format took {guidTime}ms");

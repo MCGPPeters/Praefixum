@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using Praefixum;
 
@@ -171,12 +173,20 @@ public static class TestHelpers
     /// Creates an HTML element with the specified tag and id
     /// This simulates a method that would have [UniqueId] on the id parameter
     /// </summary>
-    public static string CreateHtmlElement(string tag, string? id = null)
+    public static string CreateHtmlElement(
+        string tag,
+        string? id = null,
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
     {
         // If id is null or empty, simulate what the generator would do
         if (string.IsNullOrEmpty(id))
         {
-            id = GenerateUniqueId();
+            id = GenerateDeterministicId(
+                UniqueIdFormat.HtmlId,
+                prefix: null,
+                BuildDeterministicKey(filePath, lineNumber, memberName));
         }
         return $"<{tag} id=\"{id}\"></{tag}>";
     }
@@ -185,14 +195,23 @@ public static class TestHelpers
     /// Creates an HTML element with custom attributes
     /// This simulates a method that would have [UniqueId] on the id parameter
     /// </summary>
-    public static string CreateHtmlElementWithAttributes(string tag, string? id = null, string? className = null)
+    public static string CreateHtmlElementWithAttributes(
+        string tag,
+        string? id = null,
+        string? className = null,
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
     {
         var sb = new StringBuilder();
         sb.Append($"<{tag}");
         
         if (string.IsNullOrEmpty(id))
         {
-            id = GenerateUniqueId();
+            id = GenerateDeterministicId(
+                UniqueIdFormat.HtmlId,
+                prefix: null,
+                BuildDeterministicKey(filePath, lineNumber, memberName));
         }
         
         if (id != null)
@@ -209,11 +228,19 @@ public static class TestHelpers
     /// Creates a button with unique ID and specified text
     /// This simulates a method that would have [UniqueId(UniqueIdFormat.Guid)] on the id parameter
     /// </summary>
-    public static string CreateButton(string? id = null, string text = "Click me")
+    public static string CreateButton(
+        string? id = null,
+        string text = "Click me",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
     {
         if (string.IsNullOrEmpty(id))
         {
-            id = GenerateGuidId();
+            id = GenerateDeterministicId(
+                UniqueIdFormat.Guid,
+                prefix: null,
+                BuildDeterministicKey(filePath, lineNumber, memberName));
         }
         return $"<button id=\"{id}\">{text}</button>";
     }
@@ -222,11 +249,19 @@ public static class TestHelpers
     /// Creates an input with unique ID and specified type
     /// This simulates a method that would have [UniqueId(UniqueIdFormat.HtmlId)] on the id parameter
     /// </summary>
-    public static string CreateInput(string? id = null, string type = "text")
+    public static string CreateInput(
+        string? id = null,
+        string type = "text",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
     {
         if (string.IsNullOrEmpty(id))
         {
-            id = GenerateHtmlId();
+            id = GenerateDeterministicId(
+                UniqueIdFormat.HtmlId,
+                prefix: null,
+                BuildDeterministicKey(filePath, lineNumber, memberName));
         }
         return $"<input id=\"{id}\" type=\"{type}\" />";
     }
@@ -235,41 +270,91 @@ public static class TestHelpers
     /// Creates a div with prefix-based unique ID
     /// This simulates a method that would have [UniqueId(prefix: "div-")] on the id parameter
     /// </summary>
-    public static string CreatePrefixedDiv(string? id = null, string content = "")
+    public static string CreatePrefixedDiv(
+        string? id = null,
+        string content = "",
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
     {
         if (string.IsNullOrEmpty(id))
         {
-            id = "div-" + GenerateUniqueId();
+            id = GenerateDeterministicId(
+                UniqueIdFormat.HtmlId,
+                prefix: "div-",
+                BuildDeterministicKey(filePath, lineNumber, memberName));
         }
         return $"<div id=\"{id}\">{content}</div>";
     }
 
-    /// <summary>
-    /// Generates a GUID-style unique ID (32 character hex string)
-    /// </summary>
-    private static string GenerateGuidId()
+    private static string BuildDeterministicKey(string filePath, int lineNumber, string memberName)
     {
-        return Guid.NewGuid().ToString("N");
+        return $"{filePath}:{lineNumber}:{memberName}";
     }
 
-    /// <summary>
-    /// Generates an HTML-safe ID (6-12 characters, alphanumeric)
-    /// </summary>
-    private static string GenerateHtmlId()
+    private static string GenerateDeterministicId(UniqueIdFormat format, string? prefix, string key)
     {
-        var random = new Random();
-        const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-        var length = random.Next(6, 13); // 6-12 characters
-        return new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
+        var baseId = format switch
+        {
+            UniqueIdFormat.Guid => DeterministicGuid(key),
+            UniqueIdFormat.Timestamp => DeterministicTimestamp(key),
+            UniqueIdFormat.ShortHash => ShortHash(key),
+            UniqueIdFormat.HtmlId => HtmlSafeId(ShortHash(key)),
+            _ => throw new ArgumentOutOfRangeException(nameof(format))
+        };
+
+        return prefix is null ? baseId : $"{prefix}{baseId}";
     }
 
-    /// <summary>
-    /// Generates a basic unique ID
-    /// </summary>
-    private static string GenerateUniqueId()
+    private static string ShortHash(string key)
     {
-        return GenerateHtmlId();
+        using var sha256 = SHA256.Create();
+        var inputBytes = Encoding.UTF8.GetBytes(key);
+        var hashBytes = sha256.ComputeHash(inputBytes);
+        return Convert.ToBase64String(hashBytes)
+            .Replace("+", "a").Replace("/", "b").Replace("=", string.Empty)
+            .Substring(0, 8);
+    }
+
+    private static string DeterministicGuid(string key)
+    {
+        using var sha256 = SHA256.Create();
+        var inputBytes = Encoding.UTF8.GetBytes($"{key}:guid");
+        var hashBytes = sha256.ComputeHash(inputBytes);
+        var guidBytes = new byte[16];
+        Array.Copy(hashBytes, guidBytes, 16);
+        var guid = new Guid(guidBytes);
+        return guid.ToString("N");
+    }
+
+    private static string DeterministicTimestamp(string key)
+    {
+        using var sha256 = SHA256.Create();
+        var inputBytes = Encoding.UTF8.GetBytes($"{key}:timestamp");
+        var hashBytes = sha256.ComputeHash(inputBytes);
+        var timestampLong = Math.Abs(BitConverter.ToInt64(hashBytes, 0));
+        var baseTimestamp = 1700000000000L;
+        var maxOffset = 100000000000L;
+        var deterministicTimestamp = baseTimestamp + (timestampLong % maxOffset);
+        return deterministicTimestamp.ToString();
+    }
+
+    private static string HtmlSafeId(string id)
+    {
+        if (id.Length > 0 && !char.IsLetter(id[0]))
+            return "x" + id;
+        return id;
+    }
+
+    private static string GenerateUniqueId(
+        [CallerFilePath] string filePath = "",
+        [CallerLineNumber] int lineNumber = 0,
+        [CallerMemberName] string memberName = "")
+    {
+        return GenerateDeterministicId(
+            UniqueIdFormat.HtmlId,
+            prefix: null,
+            BuildDeterministicKey(filePath, lineNumber, memberName));
     }
 
     /// <summary>

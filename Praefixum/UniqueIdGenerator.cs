@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Praefixum;
@@ -182,10 +183,7 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
     {        var sb = new StringBuilder();
         sb.AppendLine("#nullable enable");
         sb.AppendLine("using System;");
-        sb.AppendLine("using System.Collections.Generic;");
         sb.AppendLine("using System.Runtime.CompilerServices;");
-        sb.AppendLine("using System.Security.Cryptography;");
-        sb.AppendLine("using System.Text;");
         sb.AppendLine();
         
         // Include the InterceptsLocationAttribute in the same file as the interceptors
@@ -207,8 +205,6 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         sb.AppendLine("{");
         sb.AppendLine("file static class PraefixumInterceptor");
         sb.AppendLine("{");
-        sb.AppendLine("    private static readonly Dictionary<string, int> _callsiteCounts = new();");
-        sb.AppendLine("    private static readonly object _lock = new();");
         sb.AppendLine();        for (int i = 0; i < calls.Length; i++)
         {
             var call = calls[i];
@@ -275,27 +271,13 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
                 
                 if (uniqueIdInfo != null)
                 {
-                    // This parameter has [UniqueId] - generate ID if null
-                    sb.AppendLine($"        // Generate {param.Name} if null");
-                    sb.AppendLine($"        var {param.Name}Final = {param.Name};");
-                    sb.AppendLine($"        if ({param.Name}Final == null)");
-                    sb.AppendLine("        {");
-                    sb.AppendLine($"            var key{paramIndex} = \"{call.InterceptsLocationData}:{paramIndex}\";");
-                    sb.AppendLine($"            int count{paramIndex};");
-                    sb.AppendLine();
-                    sb.AppendLine("            lock (_lock)");
-                    sb.AppendLine("            {");
-                    sb.AppendLine($"                if (!_callsiteCounts.TryGetValue(key{paramIndex}, out count{paramIndex}))");
-                    sb.AppendLine($"                    count{paramIndex} = 0;");
-                    sb.AppendLine($"                _callsiteCounts[key{paramIndex}] = count{paramIndex} + 1;");
-                    sb.AppendLine("            }");
-                    sb.AppendLine();
-                    
-                    var format = uniqueIdInfo.Format;
-                    var prefix = uniqueIdInfo.Prefix != null ? $"\"{uniqueIdInfo.Prefix}\"" : "null";
-                    sb.AppendLine($"            {param.Name}Final = GenerateId(key{paramIndex}, count{paramIndex}, UniqueIdFormat.{format}, {prefix});");
-                    sb.AppendLine("        }");
-                    sb.AppendLine();
+                    // This parameter has [UniqueId] - use a compile-time literal per call site
+                    var literal = GenerateIdLiteral(
+                        $"{call.InterceptsLocationData}:{paramIndex}",
+                        uniqueIdInfo.Format,
+                        uniqueIdInfo.Prefix);
+                    var escapedLiteral = EscapeStringLiteral(literal);
+                    sb.AppendLine($"        var {param.Name}Final = {param.Name} ?? \"{escapedLiteral}\";");
                     
                     parameterAssignments.Add($"{param.Name}Final");
                 }
@@ -320,61 +302,68 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
             sb.AppendLine();
         }
 
-        sb.AppendLine("    private static string GenerateId(string key, int count, UniqueIdFormat format = UniqueIdFormat.HtmlId, string? prefix = null)");
-        sb.AppendLine("    {");        sb.AppendLine("        string baseId = format switch");
-        sb.AppendLine("        {");
-        sb.AppendLine("            UniqueIdFormat.Guid => DeterministicGuid(key, count),");
-        sb.AppendLine("            UniqueIdFormat.Timestamp => DeterministicTimestamp(key, count),");
-        sb.AppendLine("            UniqueIdFormat.ShortHash => ShortHash(key, count),");
-        sb.AppendLine("            UniqueIdFormat.HtmlId => HtmlSafeId(ShortHash(key, count)),");
-        sb.AppendLine("            _ => throw new ArgumentOutOfRangeException()");
-        sb.AppendLine("        }; // Fixed GUID generation");
-        sb.AppendLine();
-        sb.AppendLine("        return prefix is null ? baseId : $\"{prefix}{baseId}\";");
-        sb.AppendLine("    }");
-        sb.AppendLine();        sb.AppendLine("    private static string ShortHash(string key, int count)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        using var sha256 = SHA256.Create();");
-        sb.AppendLine("        var inputBytes = Encoding.UTF8.GetBytes($\"{key}:{count}\");");
-        sb.AppendLine("        var hashBytes = sha256.ComputeHash(inputBytes);");
-        sb.AppendLine("        return Convert.ToBase64String(hashBytes)");
-        sb.AppendLine("            .Replace(\"+\", \"a\").Replace(\"/\", \"b\").Replace(\"=\", string.Empty)");
-        sb.AppendLine("            .Substring(0, 8);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private static string DeterministicGuid(string key, int count)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        using var sha256 = SHA256.Create();");
-        sb.AppendLine("        var inputBytes = Encoding.UTF8.GetBytes($\"{key}:{count}:guid\");");
-        sb.AppendLine("        var hashBytes = sha256.ComputeHash(inputBytes);");
-        sb.AppendLine("        // Take first 16 bytes for GUID");
-        sb.AppendLine("        var guidBytes = new byte[16];");
-        sb.AppendLine("        Array.Copy(hashBytes, guidBytes, 16);");
-        sb.AppendLine("        var guid = new Guid(guidBytes);");        sb.AppendLine("        return guid.ToString(\"N\");");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private static string DeterministicTimestamp(string key, int count)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        // Generate deterministic timestamp-like value from hash");
-        sb.AppendLine("        using var sha256 = SHA256.Create();");
-        sb.AppendLine("        var inputBytes = Encoding.UTF8.GetBytes($\"{key}:{count}:timestamp\");");
-        sb.AppendLine("        var hashBytes = sha256.ComputeHash(inputBytes);");
-        sb.AppendLine("        // Convert first 8 bytes to long and ensure it's positive and looks like a timestamp");
-        sb.AppendLine("        var timestampLong = Math.Abs(BitConverter.ToInt64(hashBytes, 0));");
-        sb.AppendLine("        // Scale to reasonable timestamp range (around current era)");
-        sb.AppendLine("        var baseTimestamp = 1700000000000L; // Base timestamp (year 2023)");
-        sb.AppendLine("        var maxOffset = 100000000000L; // Max offset (about 3 years)");
-        sb.AppendLine("        var deterministicTimestamp = baseTimestamp + (timestampLong % maxOffset);");
-        sb.AppendLine("        return deterministicTimestamp.ToString();");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private static string HtmlSafeId(string id)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (id.Length > 0 && !char.IsLetter(id[0]))");
-        sb.AppendLine("            return \"x\" + id;");
-        sb.AppendLine("        return id;");        sb.AppendLine("    }");
         sb.AppendLine("}");
-        sb.AppendLine("}");        return sb.ToString();
+        sb.AppendLine("}");
+        return sb.ToString();
+    }
+
+    private static string GenerateIdLiteral(string key, UniqueIdFormat format, string? prefix)
+    {
+        var baseId = format switch
+        {
+            UniqueIdFormat.Guid => DeterministicGuid(key),
+            UniqueIdFormat.Timestamp => DeterministicTimestamp(key),
+            UniqueIdFormat.ShortHash => ShortHash(key),
+            UniqueIdFormat.HtmlId => HtmlSafeId(ShortHash(key)),
+            _ => throw new ArgumentOutOfRangeException(nameof(format))
+        };
+
+        return prefix is null ? baseId : $"{prefix}{baseId}";
+    }
+
+    private static string ShortHash(string key)
+    {
+        using var sha256 = SHA256.Create();
+        var inputBytes = Encoding.UTF8.GetBytes(key);
+        var hashBytes = sha256.ComputeHash(inputBytes);
+        return Convert.ToBase64String(hashBytes)
+            .Replace("+", "a").Replace("/", "b").Replace("=", string.Empty)
+            .Substring(0, 8);
+    }
+
+    private static string DeterministicGuid(string key)
+    {
+        using var sha256 = SHA256.Create();
+        var inputBytes = Encoding.UTF8.GetBytes($"{key}:guid");
+        var hashBytes = sha256.ComputeHash(inputBytes);
+        var guidBytes = new byte[16];
+        Array.Copy(hashBytes, guidBytes, 16);
+        var guid = new Guid(guidBytes);
+        return guid.ToString("N");
+    }
+
+    private static string DeterministicTimestamp(string key)
+    {
+        using var sha256 = SHA256.Create();
+        var inputBytes = Encoding.UTF8.GetBytes($"{key}:timestamp");
+        var hashBytes = sha256.ComputeHash(inputBytes);
+        var timestampLong = Math.Abs(BitConverter.ToInt64(hashBytes, 0));
+        var baseTimestamp = 1700000000000L;
+        var maxOffset = 100000000000L;
+        var deterministicTimestamp = baseTimestamp + (timestampLong % maxOffset);
+        return deterministicTimestamp.ToString();
+    }
+
+    private static string HtmlSafeId(string id)
+    {
+        if (id.Length > 0 && !char.IsLetter(id[0]))
+            return "x" + id;
+        return id;
+    }
+
+    private static string EscapeStringLiteral(string value)
+    {
+        return value.Replace("\\", "\\\\").Replace("\"", "\\\"");
     }
 }
 

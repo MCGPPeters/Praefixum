@@ -18,7 +18,7 @@ public class UniqueIdGeneratorBasicTests
     }
 
     [Fact]
-    public void GenerateId_WithUniqueIdAttribute_GeneratesUniqueValue()
+    public void GenerateId_WithUniqueIdAttribute_GeneratesDifferentIdsForDifferentCallSites()
     {
         // Arrange & Act
         var result1 = TestHelpers.CreateHtmlElement("div", null);
@@ -71,14 +71,14 @@ public class UniqueIdGeneratorBasicTests
     }
 
     [Fact]
-    public void GenerateId_MultipleCallsSameSite_GeneratesDifferentIds()
+    public void GenerateId_MultipleCallsSameSite_GeneratesSameId()
     {
         // Arrange & Act
         var ids = TestHelpers.CreateMultipleElements(5);
         
         // Assert
         Assert.Equal(5, ids.Count);
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All IDs should be unique
+        Assert.Single(ids.Distinct());
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class UniqueIdGeneratorBasicTests
     // ==========================================
 
     [Fact]
-    public void ActualUniqueIdAttribute_GeneratesValidIds()
+    public void ActualUniqueIdAttribute_GeneratesDifferentIdsForDifferentCallSites()
     {
         // Act - using actual [UniqueId] attribute
         var div1 = TestHelpers.CreateDiv();

@@ -32,7 +32,7 @@ Praefixum/
 
 ### Prerequisites
 
-- **.NET 9.0 SDK** or later
+- **.NET 10.0 SDK** or later
 - **Visual Studio 2022 17.8+** or **JetBrains Rider 2023.3+**
 - **Git** for version control
 
