@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/MCGPPeters/Praefixum/actions/workflows/ci.yml/badge.svg)](https://github.com/MCGPPeters/Praefixum/actions)
 [![NuGet](https://img.shields.io/nuget/v/Praefixum.svg)](https://www.nuget.org/packages/Praefixum)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 **Praefixum** is a .NET 10 source generator that emits interceptors for automatic unique ID generation. It enables deterministic, human-friendly identifiers to be generated for method parameters marked with the `[UniqueId]` attribute.
 
@@ -259,7 +259,7 @@ A: Verify your project targets .NET 10, `LangVersion` is `preview`, and preview 
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 

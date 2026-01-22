@@ -36,7 +36,7 @@ Welcome to the documentation for Praefixum, the .NET 10 source generator for uni
 ### Project Information
 
 - **[Changelog](../CHANGELOG.md)** - Version history and release notes
-- **[License](../LICENSE)** - MIT license details
+- **[License](../LICENSE)** - Apache 2.0 license details
 
 ## 🎯 Quick Links
 

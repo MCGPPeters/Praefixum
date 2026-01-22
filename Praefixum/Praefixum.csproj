@@ -23,7 +23,7 @@
     <Version>1.0.18</Version>
     <!-- Version will be set by GitVersion in CI pipeline -->
     <Authors>MCGPPeters</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/MCGPPeters/Praefixum</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/MCGPPeters/Praefixum</RepositoryUrl>
