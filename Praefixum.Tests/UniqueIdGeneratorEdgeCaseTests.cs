@@ -144,7 +144,7 @@ public class UniqueIdGeneratorEdgeCaseTests
     }
 
     [Fact]
-    public async void GenerateId_ThreadSafety_ProducesDeterministicIdsAcrossThreads()
+    public async Task GenerateId_ThreadSafety_ProducesDeterministicIdsAcrossThreads()
     {
         // Arrange
         const int threadsCount = 10;

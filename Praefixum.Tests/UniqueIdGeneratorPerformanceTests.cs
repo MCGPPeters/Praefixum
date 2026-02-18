@@ -61,7 +61,7 @@ public class UniqueIdGeneratorPerformanceTests
     }
 
     [Fact]
-    public async void GenerateId_ConcurrentPerformance_HandlesParallelLoad()
+    public async Task GenerateId_ConcurrentPerformance_HandlesParallelLoad()
     {
         // Arrange
         const int concurrentTasks = 20;

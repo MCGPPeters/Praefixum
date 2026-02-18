@@ -1,4 +1,5 @@
 mode: Mainline
+next-version: 2.0.0
 tag-prefix: 'v'
 commit-message-incrementing: Enabled
 branches:

@@ -1,6 +1,6 @@
 # Praefixum - Unique ID Generator for .NET
 
-[![Build Status](https://github.com/MCGPPeters/Praefixum/actions/workflows/ci.yml/badge.svg)](https://github.com/MCGPPeters/Praefixum/actions)
+[![Build Status](https://github.com/MCGPPeters/Praefixum/actions/workflows/build.yml/badge.svg)](https://github.com/MCGPPeters/Praefixum/actions)
 [![NuGet](https://img.shields.io/nuget/v/Praefixum.svg)](https://www.nuget.org/packages/Praefixum)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
