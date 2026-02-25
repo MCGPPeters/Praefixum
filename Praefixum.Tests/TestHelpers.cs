@@ -160,6 +160,96 @@ public static class TestHelpers
         return $"<{tag} id=\"{id}\"{classAttr}>{content}</{tag}>";
     }
 
+    // ==========================================
+    // METHODS FOR TESTING DEFAULT VALUE LITERAL EMISSION (Issue #6)
+    // These methods have non-string default parameters alongside [UniqueId]
+    // to verify the source generator emits valid C# literals.
+    // ==========================================
+
+    /// <summary>
+    /// Method with bool default = false alongside [UniqueId].
+    /// Verifies the generator emits "false" (not "False").
+    /// </summary>
+    public static string CreateInputText(
+        string label,
+        bool isRequired = false,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        var requiredAttr = isRequired ? " required" : "";
+        return $"<input id=\"{id}\" type=\"text\" placeholder=\"{label}\"{requiredAttr} />";
+    }
+
+    /// <summary>
+    /// Method with bool default = true alongside [UniqueId].
+    /// Verifies the generator emits "true" (not "True").
+    /// </summary>
+    public static string CreateCheckbox(
+        string label,
+        bool isChecked = true,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        var checkedAttr = isChecked ? " checked" : "";
+        return $"<input id=\"{id}\" type=\"checkbox\"{checkedAttr} /> {label}";
+    }
+
+    /// <summary>
+    /// Method with char default alongside [UniqueId].
+    /// Verifies the generator emits 'x' (with single quotes).
+    /// </summary>
+    public static string CreateElementWithSeparator(
+        string content,
+        char separator = '-',
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<span id=\"{id}\">{content}{separator}{content}</span>";
+    }
+
+    /// <summary>
+    /// Method with float default alongside [UniqueId].
+    /// Verifies the generator emits 1.5f (with suffix).
+    /// </summary>
+    public static string CreateProgressBar(
+        float progress = 0.0f,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<progress id=\"{id}\" value=\"{progress}\"></progress>";
+    }
+
+    /// <summary>
+    /// Method with double default alongside [UniqueId].
+    /// Verifies the generator emits 1.5d (with suffix).
+    /// </summary>
+    public static string CreateMeter(
+        double value = 0.0d,
+        double max = 100.0d,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<meter id=\"{id}\" value=\"{value}\" max=\"{max}\"></meter>";
+    }
+
+    /// <summary>
+    /// Method with long default alongside [UniqueId].
+    /// Verifies the generator emits 0L (with suffix).
+    /// </summary>
+    public static string CreateDataElement(
+        long dataValue = 0L,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<data id=\"{id}\" value=\"{dataValue}\"></data>";
+    }
+
+    /// <summary>
+    /// Method with int default alongside [UniqueId].
+    /// Verifies the generator handles plain int defaults correctly.
+    /// </summary>
+    public static string CreateOrderedItem(
+        string content,
+        int order = 0,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<li id=\"{id}\" data-order=\"{order}\">{content}</li>";
+    }
+
     /// <summary>
     /// Property to store the last processed ID for void method testing
     /// </summary>

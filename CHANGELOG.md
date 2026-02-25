@@ -5,6 +5,22 @@ All notable changes to Praefixum are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-02-25
+
+### Fixed
+
+- **Bool default values** now emit `false`/`true` instead of `False`/`True` in generated interceptors ([#6](https://github.com/MCGPPeters/Praefixum/issues/6))
+- **Char default values** now emit `'x'` with proper single-quote syntax
+- **Float/double/decimal default values** now emit correct suffixes (`f`, `d`, `m`) with invariant culture formatting
+- **Long/ulong default values** now emit correct suffixes (`L`, `UL`)
+- **Enum default values** now emit proper cast syntax `(EnumType)value`
+
+### Added
+
+- 16 new tests covering default value literal emission for all affected types
+
+---
+
 ## [2.0.0] - 2026-02-18
 
 ### 🚀 First Major Release

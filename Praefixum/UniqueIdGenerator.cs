@@ -226,12 +226,8 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
                 if (param.HasExplicitDefaultValue)
                 {
                     var defaultValue = param.ExplicitDefaultValue;
-                    if (defaultValue == null)
-                        sb.Append(" = null");
-                    else if (defaultValue is string s)
-                        sb.Append($" = \"{s}\"");
-                    else
-                        sb.Append($" = {defaultValue}");
+                    sb.Append(" = ");
+                    sb.Append(FormatDefaultValue(defaultValue, param.Type));
                 }
             }
             sb.AppendLine(")");
@@ -305,6 +301,31 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         sb.AppendLine("}");
         sb.AppendLine("}");
         return sb.ToString();
+    }
+
+    private static string FormatDefaultValue(object? defaultValue, ITypeSymbol type)
+    {
+        if (defaultValue is null)
+            return "null";
+        if (defaultValue is string s)
+            return $"\"{s}\"";
+        if (defaultValue is bool b)
+            return b ? "true" : "false";
+        if (defaultValue is char c)
+            return $"'{c}'";
+        if (defaultValue is float f)
+            return FormattableString.Invariant($"{f}f");
+        if (defaultValue is double d)
+            return FormattableString.Invariant($"{d}d");
+        if (defaultValue is decimal m)
+            return FormattableString.Invariant($"{m}m");
+        if (defaultValue is long l)
+            return $"{l}L";
+        if (defaultValue is ulong ul)
+            return $"{ul}UL";
+        if (type.TypeKind == TypeKind.Enum)
+            return $"({type.ToDisplayString()}){defaultValue}";
+        return $"{defaultValue}";
     }
 
     private static string GenerateIdLiteral(string key, UniqueIdFormat format, string? prefix)

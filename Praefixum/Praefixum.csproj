@@ -21,7 +21,7 @@
   </ItemGroup>  <!-- NuGet package configuration -->
   <PropertyGroup>
     <PackageId>Praefixum</PackageId>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <!-- Version will be set by GitVersion in CI pipeline -->
     <Authors>MCGPPeters</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -31,7 +31,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>A .NET source generator that emits interceptors for automatic, deterministic, compile-time unique ID generation. Supports HTML IDs, GUIDs, timestamps, short hashes, custom prefixes, and multiple parameters per method.</Description>
-    <PackageReleaseNotes>v2.0.0 — First major release. Upgraded to .NET 10 GA with Roslyn 5.0.0. Compile-time interceptor-based ID generation with multiple format support.</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.0.1 — Bugfix: emit correct C# literals for bool, char, float, double, decimal, long, ulong, and enum default parameter values in generated interceptors (#6).</PackageReleaseNotes>
     <Copyright>Copyright © 2025-2026 MCGPPeters</Copyright>
     <PackageTags>source-generator;roslyn;unique-id;guid;identifier;interceptor;html-id;compile-time;dotnet10</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
