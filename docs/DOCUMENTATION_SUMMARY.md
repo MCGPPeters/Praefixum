@@ -33,6 +33,6 @@ This document summarizes the current documentation for Praefixum.
 
 ---
 
-**Last Updated**: January 21, 2025  
-**Documentation Version**: 1.1.7  
-**Project Version**: 1.1.7  
+**Last Updated**: March 11, 2026  
+**Documentation Version**: 2.1.0  
+**Project Version**: 2.1.0  

@@ -81,7 +81,7 @@ Note: `UniqueIdAttribute` is part of the runtime assembly, so `UniqueIdAttribute
 
 - Make sure the package reference is correct and restored:
   ```xml
-  <PackageReference Include="Praefixum" Version="1.1.7" />
+  <PackageReference Include="Praefixum" Version="2.1.0" />
   ```
 - Ensure preview features and interceptors are enabled (see above).
 - Clean and rebuild after upgrading.

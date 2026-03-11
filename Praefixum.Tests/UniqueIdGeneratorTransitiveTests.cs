@@ -55,13 +55,11 @@ public class UniqueIdGeneratorTransitiveTests
                 {
                     public UniqueIdFormat Format { get; }
                     public string? Prefix { get; }
-                    public bool Deterministic { get; }
 
-                    public UniqueIdAttribute(UniqueIdFormat format = UniqueIdFormat.Guid, string? prefix = null, bool deterministic = true)
+                    public UniqueIdAttribute(UniqueIdFormat format = UniqueIdFormat.Guid, string? prefix = null)
                     {
                         Format = format;
                         Prefix = prefix;
-                        Deterministic = deterministic;
                     }
                 }
 
@@ -70,7 +68,9 @@ public class UniqueIdGeneratorTransitiveTests
                     Guid,
                     HtmlId,
                     Timestamp,
-                    ShortHash
+                    ShortHash,
+                    Sequential,
+                    Semantic
                 }
             }
             """;

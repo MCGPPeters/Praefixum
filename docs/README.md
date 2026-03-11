@@ -84,6 +84,6 @@ Documentation improvements are welcome! Please see the [Contributing Guide](../C
 
 ---
 
-**Last updated**: January 21, 2025  
-**Documentation version**: 1.1.7  
-**Praefixum version**: 1.1.7
+**Last updated**: March 11, 2026  
+**Documentation version**: 2.1.0  
+**Praefixum version**: 2.1.0

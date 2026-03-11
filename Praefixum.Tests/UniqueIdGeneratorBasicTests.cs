@@ -127,8 +127,8 @@ public class UniqueIdGeneratorBasicTests
         Assert.Contains("id=\"", div1);
         Assert.Contains("id=\"", div2);
         
-        var id1 = ExtractId(div1);
-        var id2 = ExtractId(div2);
+        var id1 = TestHelpers.ExtractId(div1);
+        var id2 = TestHelpers.ExtractId(div2);
         Assert.NotNull(id1);
         Assert.NotNull(id2);
         Assert.NotEqual(id1, id2);
@@ -153,9 +153,9 @@ public class UniqueIdGeneratorBasicTests
         var span = TestHelpers.CreateSpanWithPrefix();
         
         // Assert
-        var buttonId = ExtractId(button);
-        var inputId = ExtractId(input);
-        var spanId = ExtractId(span);
+        var buttonId = TestHelpers.ExtractId(button);
+        var inputId = TestHelpers.ExtractId(input);
+        var spanId = TestHelpers.ExtractId(span);
         
         Assert.NotNull(buttonId);
         Assert.NotNull(inputId);
@@ -200,17 +200,9 @@ public class UniqueIdGeneratorBasicTests
         Assert.Contains("Important content", result);
         Assert.Contains("id=\"", result);
         
-        var id = ExtractId(result);
+        var id = TestHelpers.ExtractId(result);
         Assert.NotNull(id);
         Assert.NotEmpty(id);
     }
 
-    /// <summary>
-    /// Helper method to extract ID from HTML element
-    /// </summary>
-    private static string? ExtractId(string htmlElement)
-    {
-        var match = System.Text.RegularExpressions.Regex.Match(htmlElement, @"id=""([^""]+)""");
-        return match.Success ? match.Groups[1].Value : null;
-    }
 }

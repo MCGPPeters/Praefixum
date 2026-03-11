@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/UniqueIdGenerator.sln",
+                "${workspaceFolder}/Praefixum.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -20,7 +20,22 @@
             "args": [
                 "run",
                 "--project",
-                "${workspaceFolder}/UniqueIdGenerator.Demo/UniqueIdGenerator.Demo.csproj"
+                "${workspaceFolder}/Praefixum.Demo/Praefixum.Demo.csproj"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "build"
+            ]
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/Praefixum.Tests/Praefixum.Tests.csproj",
+                "--verbosity",
+                "normal"
             ],
             "problemMatcher": "$msCompile",
             "dependsOn": [

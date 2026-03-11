@@ -8,10 +8,14 @@
     <LangVersion>latest</LangVersion>
     <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    <!-- Disable nullable warnings -->
-    <NoWarn>CS8602</NoWarn>
+    <!-- Enable all nullable warnings -->
     <InterceptorsNamespaces>$(InterceptorsNamespaces);Praefixum</InterceptorsNamespaces>
   </PropertyGroup>
+
+  <!-- Expose internal ID generation methods to the test project for deduplication -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Praefixum.Tests" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
@@ -21,7 +25,7 @@
   </ItemGroup>  <!-- NuGet package configuration -->
   <PropertyGroup>
     <PackageId>Praefixum</PackageId>
-    <Version>2.0.1</Version>
+    <Version>2.1.0</Version>
     <!-- Version will be set by GitVersion in CI pipeline -->
     <Authors>MCGPPeters</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -31,12 +35,12 @@
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>A .NET source generator that emits interceptors for automatic, deterministic, compile-time unique ID generation. Supports HTML IDs, GUIDs, timestamps, short hashes, custom prefixes, and multiple parameters per method.</Description>
-    <PackageReleaseNotes>v2.0.1 — Bugfix: emit correct C# literals for bool, char, float, double, decimal, long, ulong, and enum default parameter values in generated interceptors (#6).</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.1.0 — New Sequential and Semantic ID formats, instance method interception, compiler diagnostics (PRAEF001-003), removed unused deterministic parameter, internal code deduplication, project hygiene fixes.</PackageReleaseNotes>
     <Copyright>Copyright © 2025-2026 MCGPPeters</Copyright>
     <PackageTags>source-generator;roslyn;unique-id;guid;identifier;interceptor;html-id;compile-time;dotnet10</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <DevelopmentDependency>false</DevelopmentDependency>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
   </PropertyGroup>
 

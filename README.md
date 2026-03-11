@@ -11,8 +11,10 @@
 - **Build-time interceptors** - Generated code handles IDs without manual wiring
 - **Deterministic by call site** - Same code location generates stable IDs  
 - **Multiple parameter support** - Handle multiple `[UniqueId]` parameters in a single method
-- **Multiple formats** - Support for HTML IDs, GUIDs, timestamps, and hash-based IDs
+- **Multiple formats** - Support for HTML IDs, GUIDs, timestamps, hash-based IDs, sequential numbers, and semantic IDs
 - **Prefix support** - Add custom prefixes to generated IDs
+- **Instance method support** - Works with both static and instance methods
+- **Compiler diagnostics** - Warns on attribute misuse (non-string, non-nullable, missing default)
 - **Interceptor-based** - Uses .NET 10 preview interceptors for seamless integration
 - **Thread-safe** - Generated IDs are constants, no concurrency issues
 - **Zero dependencies** - Pure source generator implementation
@@ -66,6 +68,8 @@ The source generator emits interceptors that replace null `[UniqueId]` parameter
 | `Guid` | `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6` | 32-character deterministic GUID (no dashes) |
 | `Timestamp` | `1735052327842` | Unix timestamp in milliseconds |
 | `ShortHash` | `YWJjZGVm` | 8-character Base64-encoded hash |
+| `Sequential` | `042817` | 6-digit deterministic number |
+| `Semantic` | `create-button-a3f2` | Kebab-case method name + short hash |
 
 ## 📖 Usage Examples
 
@@ -131,6 +135,59 @@ public static string Widget(
         </div>";
 }
 ```
+
+### Instance Methods
+
+Praefixum supports instance methods in addition to static methods:
+
+```csharp
+public class HtmlBuilder
+{
+    public string CreateElement(
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null,
+        string content = "")
+    {
+        return $"<div id=\"{id}\">{content}</div>";
+    }
+}
+
+// Usage
+var builder = new HtmlBuilder();
+var html = builder.CreateElement(content: "Hello"); // ID is auto-generated
+```
+
+### Sequential and Semantic Formats
+
+```csharp
+// Sequential: generates a 6-digit deterministic number
+public static string Badge(
+    string text,
+    [UniqueId(UniqueIdFormat.Sequential)] string? id = null)
+{
+    return $"<span id=\"{id}\" class=\"badge\">{text}</span>";
+}
+
+// Semantic: generates a human-readable kebab-case ID with short hash
+public static string Alert(
+    string message,
+    [UniqueId(UniqueIdFormat.Semantic)] string? id = null)
+{
+    return $"<div id=\"{id}\" role=\"alert\">{message}</div>";
+}
+
+var badge = Badge("New!");     // <span id="042817" class="badge">New!</span>
+var alert = Alert("Success!"); // <div id="alert-a3f2" role="alert">Success!</div>
+```
+
+## Compiler Diagnostics
+
+Praefixum emits diagnostics when `[UniqueId]` is misused:
+
+| ID | Severity | Description |
+|----|----------|-------------|
+| `PRAEF001` | Warning | `[UniqueId]` applied to a non-string parameter |
+| `PRAEF002` | Warning | `[UniqueId]` applied to a non-nullable string parameter |
+| `PRAEF003` | Info | `[UniqueId]` parameter has no default value |
 
 ## 🏗️ How It Works
 
@@ -224,15 +281,22 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 Praefixum/
 ├── Praefixum/                    # Main source generator project
 │   ├── UniqueIdGenerator.cs      # Core source generator logic
-│   └── UniqueIdAttribute.cs      # Attribute definitions
+│   ├── UniqueIdAttribute.cs      # Attribute and enum definitions
+│   └── IsExternalInit.cs         # netstandard2.0 polyfill
 ├── Praefixum.Demo/              # Demo application
 │   ├── Program.cs               # Console demo
 │   └── Html.cs                  # HTML generation examples
 ├── Praefixum.Tests/             # Comprehensive test suite
 │   ├── UniqueIdGeneratorBasicTests.cs
-│   ├── UniqueIdGeneratorEdgeCaseTests.cs
+│   ├── UniqueIdAttributeTests.cs
 │   ├── UniqueIdFormatTests.cs
+│   ├── UniqueIdGeneratorDefaultValueTests.cs
+│   ├── UniqueIdGeneratorEdgeCaseTests.cs
 │   ├── UniqueIdGeneratorPerformanceTests.cs
+│   ├── UniqueIdGeneratorReturnTypeTests.cs
+│   ├── UniqueIdGeneratorTransitiveTests.cs
+│   ├── UniqueIdInstanceMethodTests.cs
+│   ├── UniqueIdDiagnosticTests.cs
 │   └── TestHelpers.cs
 └── docs/                        # Documentation
 ```
