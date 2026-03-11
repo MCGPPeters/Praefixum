@@ -307,7 +307,7 @@ public class UniqueIdAttributeTests
         Assert.NotNull(id);
         Assert.NotEmpty(id);
         // Sequential format should be a 6-digit zero-padded number
-        Assert.Matches(@"^\d{6,}$", id);
+        Assert.Matches(@"^\d{6}$", id);
     }
 
     [Fact]

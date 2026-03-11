@@ -211,7 +211,7 @@ public class UniqueIdInstanceMethodTests
     }
 
     [Fact]
-    public void InstanceMethod_DifferentInstances_SameCallSite_ProduceSameId()
+    public void InstanceMethod_DifferentInstances_DifferentCallSites_ProduceDifferentIds()
     {
         // The ID is determined by call site, not by instance
         var builder1 = new HtmlBuilder("div");

@@ -139,7 +139,7 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         {
             var paramType = p.param.Type;
             var paramName = p.param.Name;
-            var location = invocation.GetLocation();
+            var location = p.param.Locations.FirstOrDefault() ?? invocation.GetLocation();
 
             // Check if parameter type is string
             if (paramType.SpecialType != SpecialType.System_String)
@@ -171,6 +171,12 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
             }
         }
 
+        // Only include parameters that are valid for interception (nullable string with default)
+        var validUniqueIdParams = parametersWithUniqueId
+            .Where(x => x.param.Type.SpecialType == SpecialType.System_String
+                        && x.param.Type.NullableAnnotation == NullableAnnotation.Annotated)
+            .ToList();
+
         // Get the interceptable location using Roslyn API
         var interceptableLocation = semanticModel.GetInterceptableLocation(invocation, CancellationToken.None);
         if (interceptableLocation == null)
@@ -182,21 +188,23 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 
         var isInstanceMethod = !method.IsStatic;
 
+        var uniqueIdParameters = validUniqueIdParams.Select(x => new ParameterInfo(
+            x.index,
+            GetUniqueIdFormat(x.param),
+            GetPrefix(x.param)
+        )).ToList();
+
         return new MethodCallInfo(
             method.ContainingType.ToDisplayString(),
             method.Name,
             method.ReturnType.ToDisplayString(),
             dataValue,
             method.Parameters.ToArray(),
-            parametersWithUniqueId.Select(x => new ParameterInfo(
-                x.index,
-                GetUniqueIdFormat(x.param),
-                GetPrefix(x.param)
-            )).ToList(),
+            uniqueIdParameters,
             isInstanceMethod,
             isInstanceMethod ? method.ContainingType : null,
             diagnostics,
-            IsValid: true
+            IsValid: uniqueIdParameters.Count > 0
         );
     }
 
@@ -348,9 +356,10 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
 
             sb.AppendLine("    {");
 
-            // Check if ALL unique ID parameters are provided - if so, call original method
-            var uniqueIdParams = call.Parameters.Where(p => p.GetAttributes().Any(attr =>
-                attr.AttributeClass?.Name == "UniqueIdAttribute")).ToList();
+            // Check if ALL injectable unique ID parameters are provided - if so, call original method
+            var uniqueIdParams = call.UniqueIdParameters
+                .Select(pInfo => call.Parameters[pInfo.Index])
+                .ToList();
 
             if (uniqueIdParams.Count > 1)
             {
@@ -511,7 +520,7 @@ public sealed class PraefixumSourceGenerator : IIncrementalGenerator
         using var sha256 = SHA256.Create();
         var inputBytes = Encoding.UTF8.GetBytes($"{key}:sequential");
         var hashBytes = sha256.ComputeHash(inputBytes);
-        var value = Math.Abs(BitConverter.ToInt32(hashBytes, 0));
+        var value = BitConverter.ToUInt32(hashBytes, 0) % 1_000_000u;
         return value.ToString("D6");
     }
 

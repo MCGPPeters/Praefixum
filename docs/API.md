@@ -104,8 +104,8 @@ Praefixum emits diagnostics when `[UniqueId]` is applied incorrectly:
 
 | ID | Severity | Condition | Description |
 |----|----------|-----------|-------------|
-| `PRAEF001` | Warning | Non-string parameter | `[UniqueId]` is only meaningful on `string` parameters. Applied to a non-string parameter, the attribute is ignored. |
-| `PRAEF002` | Warning | Non-nullable string | `[UniqueId]` requires a nullable `string?` parameter so the generator can detect when to supply a value. A non-nullable `string` will never be null at the call site. |
+| `PRAEF001` | Warning | Non-string parameter | `[UniqueId]` is only supported on `string` parameters. Applied to a non-string parameter, the attribute is ignored and no interceptor is generated for that parameter. |
+| `PRAEF002` | Warning | Non-nullable string | `[UniqueId]` requires a nullable `string?` parameter so the generator can detect when to supply a value. A non-nullable `string` parameter is excluded from interception. |
 | `PRAEF003` | Info | No default value | `[UniqueId]` parameters should have a default value (typically `null`) so callers can omit the argument and let the generator fill it in. |
 
 ## Behavior
