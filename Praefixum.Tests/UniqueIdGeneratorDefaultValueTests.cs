@@ -185,9 +185,9 @@ public class UniqueIdGeneratorDefaultValueTests
         var checkbox = TestHelpers.CreateCheckbox("Check");
         var progress = TestHelpers.CreateProgressBar();
         
-        var inputId = ExtractId(input);
-        var checkboxId = ExtractId(checkbox);
-        var progressId = ExtractId(progress);
+        var inputId = TestHelpers.ExtractId(input);
+        var checkboxId = TestHelpers.ExtractId(checkbox);
+        var progressId = TestHelpers.ExtractId(progress);
         
         Assert.NotNull(inputId);
         Assert.NotNull(checkboxId);
@@ -199,9 +199,70 @@ public class UniqueIdGeneratorDefaultValueTests
         Assert.NotEqual(checkboxId, progressId);
     }
 
-    private static string? ExtractId(string html)
+    // ==========================================
+    // ulong defaults
+    // ==========================================
+
+    [Fact]
+    public void UlongDefault_CompilesAndRunsCorrectly()
     {
-        var match = System.Text.RegularExpressions.Regex.Match(html, @"id=""([^""]+)""");
-        return match.Success ? match.Groups[1].Value : null;
+        var result = TestHelpers.CreateUlongElement();
+        
+        Assert.Contains("id=\"", result);
+        Assert.Contains("data-counter=\"0\"", result); // counter defaults to 0UL
     }
+
+    [Fact]
+    public void UlongDefault_WithExplicitValue_Works()
+    {
+        var result = TestHelpers.CreateUlongElement(counter: 18446744073709551615UL);
+        
+        Assert.Contains("id=\"", result);
+        Assert.Contains("18446744073709551615", result);
+    }
+
+    // ==========================================
+    // decimal defaults
+    // ==========================================
+
+    [Fact]
+    public void DecimalDefault_CompilesAndRunsCorrectly()
+    {
+        var result = TestHelpers.CreatePriceElement();
+        
+        Assert.Contains("id=\"", result);
+        Assert.Contains("data-price=\"0.0\"", result); // price defaults to 0.0m
+    }
+
+    [Fact]
+    public void DecimalDefault_WithExplicitValue_Works()
+    {
+        var result = TestHelpers.CreatePriceElement(price: 99.99m);
+        
+        Assert.Contains("id=\"", result);
+        Assert.Contains("99.99", result);
+    }
+
+    // ==========================================
+    // enum defaults
+    // ==========================================
+
+    [Fact]
+    public void EnumDefault_CompilesAndRunsCorrectly()
+    {
+        var result = TestHelpers.CreateAlignedElement("text");
+        
+        Assert.Contains("id=\"", result);
+        Assert.Contains("data-comparison=\"Ordinal\"", result); // defaults to StringComparison.Ordinal
+    }
+
+    [Fact]
+    public void EnumDefault_WithExplicitValue_Works()
+    {
+        var result = TestHelpers.CreateAlignedElement("text", comparison: System.StringComparison.OrdinalIgnoreCase);
+        
+        Assert.Contains("id=\"", result);
+        Assert.Contains("OrdinalIgnoreCase", result);
+    }
+
 }

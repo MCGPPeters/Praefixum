@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/UniqueIdGenerator.Demo/bin/Debug/net8.0/UniqueIdGenerator.Demo.dll",
+            "program": "${workspaceFolder}/Praefixum.Demo/bin/Debug/net10.0/Praefixum.Demo.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/UniqueIdGenerator.Demo",
+            "cwd": "${workspaceFolder}/Praefixum.Demo",
             "console": "internalConsole",
             "stopAtEntry": false
         }

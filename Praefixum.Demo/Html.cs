@@ -16,7 +16,15 @@ public static class Html
     public static int GetElementCount(string selector, [UniqueId(UniqueIdFormat.HtmlId)] string? id = null) =>
         selector.Length + (id?.Length ?? 0);
 
-    // NEW: Multiple UniqueId parameters demonstration
+    // NEW: Sequential format — generates a deterministic 6-digit number
+    public static string Badge(string content, [UniqueId(UniqueIdFormat.Sequential)] string? id = null) =>
+        $"<span id=\"{id}\" class=\"badge\">{content}</span>";
+
+    // NEW: Semantic format — generates a human-readable kebab-case ID with short hash
+    public static string Alert(string message, [UniqueId(UniqueIdFormat.Semantic)] string? id = null) =>
+        $"<div id=\"{id}\" class=\"alert\" role=\"alert\">{message}</div>";
+
+    // Multiple UniqueId parameters demonstration
     public static string CreateForm(
         [UniqueId(UniqueIdFormat.HtmlId, prefix: "form-")] string? formId = null,
         [UniqueId(UniqueIdFormat.HtmlId)] string? nameInputId = null,

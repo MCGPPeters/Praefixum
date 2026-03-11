@@ -376,8 +376,8 @@ public class UniqueIdFormatTests
         var button2 = TestHelpers.CreateButtonWithGuid();
 
         // Assert
-        var id1 = ExtractIdFromHtml(button1);
-        var id2 = ExtractIdFromHtml(button2);
+        var id1 = TestHelpers.ExtractId(button1);
+        var id2 = TestHelpers.ExtractId(button2);
 
         Assert.NotNull(id1);
         Assert.NotNull(id2);
@@ -396,8 +396,8 @@ public class UniqueIdFormatTests
         var input2 = TestHelpers.CreateInputWithHtmlId();
 
         // Assert
-        var id1 = ExtractIdFromHtml(input1);
-        var id2 = ExtractIdFromHtml(input2);
+        var id1 = TestHelpers.ExtractId(input1);
+        var id2 = TestHelpers.ExtractId(input2);
 
         Assert.NotNull(id1);
         Assert.NotNull(id2);
@@ -416,8 +416,8 @@ public class UniqueIdFormatTests
         var span2 = TestHelpers.CreateSpanWithPrefix();
 
         // Assert
-        var id1 = ExtractIdFromHtml(span1);
-        var id2 = ExtractIdFromHtml(span2);
+        var id1 = TestHelpers.ExtractId(span1);
+        var id2 = TestHelpers.ExtractId(span2);
 
         Assert.NotNull(id1);
         Assert.NotNull(id2);
@@ -436,8 +436,8 @@ public class UniqueIdFormatTests
         var section2 = TestHelpers.CreateSectionWithTimestamp();
 
         // Assert
-        var id1 = ExtractIdFromHtml(section1);
-        var id2 = ExtractIdFromHtml(section2);
+        var id1 = TestHelpers.ExtractId(section1);
+        var id2 = TestHelpers.ExtractId(section2);
 
         Assert.NotNull(id1);
         Assert.NotNull(id2);
@@ -452,8 +452,8 @@ public class UniqueIdFormatTests
         var article2 = TestHelpers.CreateArticleWithShortHash();
 
         // Assert
-        var id1 = ExtractIdFromHtml(article1);
-        var id2 = ExtractIdFromHtml(article2);
+        var id1 = TestHelpers.ExtractId(article1);
+        var id2 = TestHelpers.ExtractId(article2);
 
         Assert.NotNull(id1);
         Assert.NotNull(id2);
@@ -476,11 +476,11 @@ public class UniqueIdFormatTests
             var timestampSection = TestHelpers.CreateSectionWithTimestamp();
             var shortHashArticle = TestHelpers.CreateArticleWithShortHash();
 
-            var guidId = ExtractIdFromHtml(guidButton);
-            var htmlId = ExtractIdFromHtml(htmlInput);
-            var prefixedId = ExtractIdFromHtml(prefixedSpan);
-            var timestampId = ExtractIdFromHtml(timestampSection);
-            var shortHashId = ExtractIdFromHtml(shortHashArticle);
+            var guidId = TestHelpers.ExtractId(guidButton);
+            var htmlId = TestHelpers.ExtractId(htmlInput);
+            var prefixedId = TestHelpers.ExtractId(prefixedSpan);
+            var timestampId = TestHelpers.ExtractId(timestampSection);
+            var shortHashId = TestHelpers.ExtractId(shortHashArticle);
 
             // Only add non-null IDs to avoid skewing the count
             if (guidId != null) allIds.Add(guidId);
@@ -543,8 +543,8 @@ public class UniqueIdFormatTests
         var element2 = await TestHelpers.CreateElementAsync();
 
         // Assert
-        var id1 = ExtractIdFromHtml(element1);
-        var id2 = ExtractIdFromHtml(element2);
+        var id1 = TestHelpers.ExtractId(element1);
+        var id2 = TestHelpers.ExtractId(element2);
 
         Assert.NotNull(id1);
         Assert.NotNull(id2);
@@ -562,11 +562,11 @@ public class UniqueIdFormatTests
         var shortHashArticle = TestHelpers.CreateArticleWithShortHash();
 
         // Check if we can extract IDs
-        var guidId = ExtractIdFromHtml(guidButton);
-        var htmlId = ExtractIdFromHtml(htmlInput);
-        var prefixedId = ExtractIdFromHtml(prefixedSpan);
-        var timestampId = ExtractIdFromHtml(timestampSection);
-        var shortHashId = ExtractIdFromHtml(shortHashArticle);
+        var guidId = TestHelpers.ExtractId(guidButton);
+        var htmlId = TestHelpers.ExtractId(htmlInput);
+        var prefixedId = TestHelpers.ExtractId(prefixedSpan);
+        var timestampId = TestHelpers.ExtractId(timestampSection);
+        var shortHashId = TestHelpers.ExtractId(shortHashArticle);
 
         // Count how many are null
         var nullCount = 0;
@@ -589,12 +589,4 @@ public class UniqueIdFormatTests
         }        Assert.True(true, "All methods generated valid HTML with IDs");
     }
 
-    /// <summary>
-    /// Helper method to extract ID from HTML element
-    /// </summary>
-    private static string? ExtractIdFromHtml(string htmlElement)
-    {
-        var match = System.Text.RegularExpressions.Regex.Match(htmlElement, @"id=""([^""]+)""");
-        return match.Success ? match.Groups[1].Value : null;
-    }
 }

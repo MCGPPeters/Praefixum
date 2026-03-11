@@ -18,15 +18,13 @@ public sealed class UniqueIdAttribute : Attribute
 ```csharp
 public UniqueIdAttribute(
     UniqueIdFormat format = UniqueIdFormat.Guid,
-    string? prefix = null,
-    bool deterministic = true)
+    string? prefix = null)
 ```
 
 Parameters:
 
 - `format` (`UniqueIdFormat`, optional): The format for the generated ID (default: `Guid`).
 - `prefix` (`string`, optional): String to prepend to the generated ID.
-- `deterministic` (`bool`, optional): Reserved for future use. IDs are deterministic by call site.
 
 #### Properties
 
@@ -34,11 +32,11 @@ Parameters:
 |----------|------|-------------|
 | `Format` | `UniqueIdFormat` | The ID format to use |
 | `Prefix` | `string?` | Prefix added to the generated ID |
-| `Deterministic` | `bool` | Reserved for future use |
 
 #### Example Usage
 
 ```csharp
+// Static method
 public static string CreateButton(
     string text,
     [UniqueId(UniqueIdFormat.HtmlId, prefix: "btn-")] string? id = null)
@@ -46,6 +44,18 @@ public static string CreateButton(
     return $"<button id=\"{id}\">{text}</button>";
 }
 
+// Instance method
+public class HtmlBuilder
+{
+    public string CreateElement(
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null,
+        string content = "")
+    {
+        return $"<div id=\"{id}\">{content}</div>";
+    }
+}
+
+// Multiple parameters
 public static string CreateForm(
     [UniqueId(UniqueIdFormat.HtmlId, prefix: "form-")] string? formId = null,
     [UniqueId(UniqueIdFormat.HtmlId)] string? inputId = null,
@@ -71,7 +81,9 @@ public enum UniqueIdFormat
     Guid,
     HtmlId,
     Timestamp,
-    ShortHash
+    ShortHash,
+    Sequential,
+    Semantic
 }
 ```
 
@@ -83,12 +95,25 @@ public enum UniqueIdFormat
 | `HtmlId` | `xa1b2c3d4` | HTML-compliant ID starting with a letter |
 | `Timestamp` | `1735052327842` | Timestamp-like numeric string |
 | `ShortHash` | `YWJjZGVm` | 8-character hash string |
+| `Sequential` | `042817` | 6-digit deterministic number |
+| `Semantic` | `create-button-a3f2` | Kebab-case method name + short hash |
+
+## Compiler Diagnostics
+
+Praefixum emits diagnostics when `[UniqueId]` is applied incorrectly:
+
+| ID | Severity | Condition | Description |
+|----|----------|-----------|-------------|
+| `PRAEF001` | Warning | Non-string parameter | `[UniqueId]` is only supported on `string` parameters. Applied to a non-string parameter, the attribute is ignored and no interceptor is generated for that parameter. |
+| `PRAEF002` | Warning | Non-nullable string | `[UniqueId]` requires a nullable `string?` parameter so the generator can detect when to supply a value. A non-nullable `string` parameter is excluded from interception. |
+| `PRAEF003` | Info | No default value | `[UniqueId]` parameters should have a default value (typically `null`) so callers can omit the argument and let the generator fill it in. |
 
 ## Behavior
 
-- The generator emits interceptor methods at build time.
+- The generator emits interceptor methods at build time for both static and instance methods.
 - At invocation time, the generated interceptor supplies literal IDs for null parameters and calls the original method.
-- IDs are derived from the call-site location at build time.
+- IDs are derived from the call-site location at build time, making them deterministic.
+- For instance methods, the generator emits extension-method-style interceptors with a `this` parameter.
 
 ## Generated Output
 

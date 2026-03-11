@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Text;
 using Praefixum;
 
@@ -68,6 +67,24 @@ public static class TestHelpers
     public static string CreateArticleWithShortHash([UniqueId(UniqueIdFormat.ShortHash)] string? id = null, string content = "")
     {
         return $"<article id=\"{id}\">{content}</article>";
+    }
+
+    /// <summary>
+    /// Creates an HTML nav element with a sequential unique ID
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateNavWithSequential([UniqueId(UniqueIdFormat.Sequential)] string? id = null, string content = "")
+    {
+        return $"<nav id=\"{id}\">{content}</nav>";
+    }
+
+    /// <summary>
+    /// Creates an HTML header element with a semantic unique ID
+    /// This method uses [UniqueId] and will trigger source generation
+    /// </summary>
+    public static string CreateHeaderWithSemantic([UniqueId(UniqueIdFormat.Semantic)] string? id = null, string content = "")
+    {
+        return $"<header id=\"{id}\">{content}</header>";
     }
 
     /// <summary>
@@ -251,6 +268,40 @@ public static class TestHelpers
     }
 
     /// <summary>
+    /// Method with ulong default alongside [UniqueId].
+    /// Verifies the generator emits 0UL (with suffix).
+    /// </summary>
+    public static string CreateUlongElement(
+        ulong counter = 0UL,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<span id=\"{id}\" data-counter=\"{counter}\"></span>";
+    }
+
+    /// <summary>
+    /// Method with decimal default alongside [UniqueId].
+    /// Verifies the generator emits 0.0m (with suffix).
+    /// </summary>
+    public static string CreatePriceElement(
+        decimal price = 0.0m,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<span id=\"{id}\" data-price=\"{price.ToString(System.Globalization.CultureInfo.InvariantCulture)}\"></span>";
+    }
+
+    /// <summary>
+    /// Method with enum default alongside [UniqueId].
+    /// Verifies the generator emits (EnumType)value cast syntax.
+    /// </summary>
+    public static string CreateAlignedElement(
+        string content,
+        System.StringComparison comparison = System.StringComparison.Ordinal,
+        [UniqueId(UniqueIdFormat.HtmlId)] string? id = null)
+    {
+        return $"<div id=\"{id}\" data-comparison=\"{comparison}\">{content}</div>";
+    }
+
+    /// <summary>
     /// Property to store the last processed ID for void method testing
     /// </summary>
     public static string? LastProcessedId { get; private set; }
@@ -386,54 +437,16 @@ public static class TestHelpers
     {
         var baseId = format switch
         {
-            UniqueIdFormat.Guid => DeterministicGuid(key),
-            UniqueIdFormat.Timestamp => DeterministicTimestamp(key),
-            UniqueIdFormat.ShortHash => ShortHash(key),
-            UniqueIdFormat.HtmlId => HtmlSafeId(ShortHash(key)),
+            UniqueIdFormat.Guid => PraefixumSourceGenerator.DeterministicGuid(key),
+            UniqueIdFormat.Timestamp => PraefixumSourceGenerator.DeterministicTimestamp(key),
+            UniqueIdFormat.ShortHash => PraefixumSourceGenerator.ShortHash(key),
+            UniqueIdFormat.HtmlId => PraefixumSourceGenerator.HtmlSafeId(PraefixumSourceGenerator.ShortHash(key)),
+            UniqueIdFormat.Sequential => PraefixumSourceGenerator.DeterministicSequential(key),
+            UniqueIdFormat.Semantic => PraefixumSourceGenerator.DeterministicSemantic(key),
             _ => throw new ArgumentOutOfRangeException(nameof(format))
         };
 
         return prefix is null ? baseId : $"{prefix}{baseId}";
-    }
-
-    private static string ShortHash(string key)
-    {
-        using var sha256 = SHA256.Create();
-        var inputBytes = Encoding.UTF8.GetBytes(key);
-        var hashBytes = sha256.ComputeHash(inputBytes);
-        return Convert.ToBase64String(hashBytes)
-            .Replace("+", "a").Replace("/", "b").Replace("=", string.Empty)
-            .Substring(0, 8);
-    }
-
-    private static string DeterministicGuid(string key)
-    {
-        using var sha256 = SHA256.Create();
-        var inputBytes = Encoding.UTF8.GetBytes($"{key}:guid");
-        var hashBytes = sha256.ComputeHash(inputBytes);
-        var guidBytes = new byte[16];
-        Array.Copy(hashBytes, guidBytes, 16);
-        var guid = new Guid(guidBytes);
-        return guid.ToString("N");
-    }
-
-    private static string DeterministicTimestamp(string key)
-    {
-        using var sha256 = SHA256.Create();
-        var inputBytes = Encoding.UTF8.GetBytes($"{key}:timestamp");
-        var hashBytes = sha256.ComputeHash(inputBytes);
-        var timestampLong = Math.Abs(BitConverter.ToInt64(hashBytes, 0));
-        var baseTimestamp = 1700000000000L;
-        var maxOffset = 100000000000L;
-        var deterministicTimestamp = baseTimestamp + (timestampLong % maxOffset);
-        return deterministicTimestamp.ToString();
-    }
-
-    private static string HtmlSafeId(string id)
-    {
-        if (id.Length > 0 && !char.IsLetter(id[0]))
-            return "x" + id;
-        return id;
     }
 
     private static string GenerateUniqueId(

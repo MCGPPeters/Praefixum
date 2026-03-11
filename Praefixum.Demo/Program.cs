@@ -30,7 +30,15 @@ namespace Praefixum.Demo
             var explicitDiv = Div("Explicit Div Content", "my-div-id");
             Console.WriteLine($"Explicit Div: {explicitDiv}");
 
-            // NEW: Test multiple UniqueId parameters
+            // NEW: Sequential and Semantic formats
+            Console.WriteLine("\n--- New Format Examples ---");
+            var badge = Badge("New!");
+            Console.WriteLine($"Badge (Sequential): {badge}");
+
+            var alert = Alert("Operation completed successfully.");
+            Console.WriteLine($"Alert (Semantic): {alert}");
+
+            // Multiple UniqueId parameters
             Console.WriteLine("\n--- Multiple Parameter Examples ---");
             var form = CreateForm();
             Console.WriteLine($"Form with multiple auto IDs:\n{form}");

@@ -20,8 +20,8 @@ public class UniqueIdAttributeTests
         Assert.Contains("id=\"", result1);
         Assert.Contains("id=\"", result2);
         
-        var id1 = ExtractId(result1);
-        var id2 = ExtractId(result2);
+        var id1 = TestHelpers.ExtractId(result1);
+        var id2 = TestHelpers.ExtractId(result2);
         Assert.NotNull(id1);
         Assert.NotNull(id2);
         Assert.NotEqual(id1, id2);
@@ -44,7 +44,7 @@ public class UniqueIdAttributeTests
         var result = TestHelpers.CreateButtonWithGuid();
 
         // Assert
-        var id = ExtractId(result);
+        var id = TestHelpers.ExtractId(result);
         Assert.NotNull(id);
         Assert.Equal(32, id.Length); // GUID without dashes should be 32 characters
         Assert.True(id.All(c => char.IsLetterOrDigit(c)));
@@ -57,7 +57,7 @@ public class UniqueIdAttributeTests
         var result = TestHelpers.CreateInputWithHtmlId();
 
         // Assert
-        var id = ExtractId(result);
+        var id = TestHelpers.ExtractId(result);
         Assert.NotNull(id);
         Assert.True(id.Length >= 4); // HTML IDs should be reasonably short
         Assert.True(id.All(c => char.IsLetterOrDigit(c) || c == '-' || c == '_'));
@@ -71,7 +71,7 @@ public class UniqueIdAttributeTests
         var result = TestHelpers.CreateSpanWithPrefix();
 
         // Assert
-        var id = ExtractId(result);
+        var id = TestHelpers.ExtractId(result);
         Assert.NotNull(id);
         Assert.StartsWith("span-", id);
     }
@@ -83,13 +83,13 @@ public class UniqueIdAttributeTests
         var result = TestHelpers.CreateSectionWithTimestamp();
 
         // Assert
-        var id = ExtractId(result);
+        var id = TestHelpers.ExtractId(result);
         Assert.NotNull(id);
         Assert.NotEmpty(id);
         // Timestamp-based IDs should be different when called at different times
         Thread.Sleep(1);
         var result2 = TestHelpers.CreateSectionWithTimestamp();
-        var id2 = ExtractId(result2);
+        var id2 = TestHelpers.ExtractId(result2);
         Assert.NotEqual(id, id2);
     }
 
@@ -100,7 +100,7 @@ public class UniqueIdAttributeTests
         var result = TestHelpers.CreateArticleWithShortHash();
 
         // Assert
-        var id = ExtractId(result);
+        var id = TestHelpers.ExtractId(result);
         Assert.NotNull(id);
         Assert.NotEmpty(id);
         Assert.True(id.Length <= 16); // Short hash should be reasonably short
@@ -197,8 +197,8 @@ public class UniqueIdAttributeTests
 
         // Assert
         Assert.NotEqual(result1, result2);
-        var id1 = ExtractId(result1);
-        var id2 = ExtractId(result2);
+        var id1 = TestHelpers.ExtractId(result1);
+        var id2 = TestHelpers.ExtractId(result2);
         Assert.NotNull(id1);
         Assert.NotNull(id2);
         Assert.NotEqual(id1, id2);
@@ -223,7 +223,7 @@ public class UniqueIdAttributeTests
         var result = TestHelpers.CreateComplexElement("p", className: "test-class", content: "Hello World");
 
         // Assert
-        var id = ExtractId(result);
+        var id = TestHelpers.ExtractId(result);
         Assert.NotNull(id);
         Assert.Contains("class=\"test-class\"", result);
         Assert.Contains("Hello World", result);
@@ -241,7 +241,7 @@ public class UniqueIdAttributeTests
         for (int i = 0; i < count; i++)
         {
             var result = TestHelpers.CreateDiv();
-            var id = ExtractId(result);
+            var id = TestHelpers.ExtractId(result);
             Assert.NotNull(id);
             ids.Add(id);
         }
@@ -259,9 +259,9 @@ public class UniqueIdAttributeTests
         var prefixedSpan = TestHelpers.CreateSpanWithPrefix();
 
         // Assert
-        var guidId = ExtractId(guidButton);
-        var htmlId = ExtractId(htmlInput);
-        var prefixedId = ExtractId(prefixedSpan);
+        var guidId = TestHelpers.ExtractId(guidButton);
+        var htmlId = TestHelpers.ExtractId(htmlInput);
+        var prefixedId = TestHelpers.ExtractId(prefixedSpan);
 
         Assert.NotNull(guidId);
         Assert.NotNull(htmlId);
@@ -292,12 +292,144 @@ public class UniqueIdAttributeTests
         Assert.Contains("my-explicit-input-id", inputResult);
     }
 
-    /// <summary>
-    /// Helper method to extract ID from HTML element
-    /// </summary>
-    private static string? ExtractId(string htmlElement)
+    // ==========================================
+    // TESTS FOR NEW Sequential AND Semantic FORMATS
+    // ==========================================
+
+    [Fact]
+    public void CreateNavWithSequential_GeneratesSequentialFormatId()
     {
-        var match = System.Text.RegularExpressions.Regex.Match(htmlElement, @"id=""([^""]+)""");
-        return match.Success ? match.Groups[1].Value : null;
+        // Act
+        var result = TestHelpers.CreateNavWithSequential();
+
+        // Assert
+        var id = TestHelpers.ExtractId(result);
+        Assert.NotNull(id);
+        Assert.NotEmpty(id);
+        // Sequential format should be a 6-digit zero-padded number
+        Assert.Matches(@"^\d{6}$", id);
+    }
+
+    [Fact]
+    public void CreateNavWithSequential_IsDeterministicPerCallSite()
+    {
+        // Act
+        var ids = new HashSet<string>();
+        for (int i = 0; i < 10; i++)
+        {
+            var result = TestHelpers.CreateNavWithSequential();
+            var id = TestHelpers.ExtractId(result);
+            Assert.NotNull(id);
+            ids.Add(id);
+        }
+
+        // Assert — same call site should produce the same ID
+        Assert.Single(ids);
+    }
+
+    [Fact]
+    public void CreateNavWithSequential_DifferentCallSites_ProduceDifferentIds()
+    {
+        // Act — two distinct call sites
+        var nav1 = TestHelpers.CreateNavWithSequential();
+        var nav2 = TestHelpers.CreateNavWithSequential();
+
+        // Assert
+        var id1 = TestHelpers.ExtractId(nav1);
+        var id2 = TestHelpers.ExtractId(nav2);
+        Assert.NotNull(id1);
+        Assert.NotNull(id2);
+        Assert.NotEqual(id1, id2);
+    }
+
+    [Fact]
+    public void CreateNavWithSequential_WithExplicitId_UsesProvidedId()
+    {
+        // Act
+        var result = TestHelpers.CreateNavWithSequential("my-nav-id");
+
+        // Assert
+        Assert.Contains("my-nav-id", result);
+    }
+
+    [Fact]
+    public void CreateHeaderWithSemantic_GeneratesSemanticFormatId()
+    {
+        // Act
+        var result = TestHelpers.CreateHeaderWithSemantic();
+
+        // Assert
+        var id = TestHelpers.ExtractId(result);
+        Assert.NotNull(id);
+        Assert.NotEmpty(id);
+        // Semantic format should be kebab-case-fragment-hash e.g. "create-header-with-semantic-a3f2"
+        Assert.Contains("-", id);
+        // Should end with a short hash (4 hex-like chars)
+        var parts = id.Split('-');
+        Assert.True(parts.Length >= 2, $"Semantic ID '{id}' should have at least 2 parts separated by '-'");
+    }
+
+    [Fact]
+    public void CreateHeaderWithSemantic_IsDeterministicPerCallSite()
+    {
+        // Act
+        var ids = new HashSet<string>();
+        for (int i = 0; i < 10; i++)
+        {
+            var result = TestHelpers.CreateHeaderWithSemantic();
+            var id = TestHelpers.ExtractId(result);
+            Assert.NotNull(id);
+            ids.Add(id);
+        }
+
+        // Assert — same call site should produce the same ID
+        Assert.Single(ids);
+    }
+
+    [Fact]
+    public void CreateHeaderWithSemantic_DifferentCallSites_ProduceDifferentIds()
+    {
+        // Act — two distinct call sites
+        var header1 = TestHelpers.CreateHeaderWithSemantic();
+        var header2 = TestHelpers.CreateHeaderWithSemantic();
+
+        // Assert
+        var id1 = TestHelpers.ExtractId(header1);
+        var id2 = TestHelpers.ExtractId(header2);
+        Assert.NotNull(id1);
+        Assert.NotNull(id2);
+        Assert.NotEqual(id1, id2);
+    }
+
+    [Fact]
+    public void CreateHeaderWithSemantic_WithExplicitId_UsesProvidedId()
+    {
+        // Act
+        var result = TestHelpers.CreateHeaderWithSemantic("my-header-id");
+
+        // Assert
+        Assert.Contains("my-header-id", result);
+    }
+
+    [Fact]
+    public void SequentialAndSemantic_ProduceDifferentStyleIds()
+    {
+        // Act
+        var nav = TestHelpers.CreateNavWithSequential();
+        var header = TestHelpers.CreateHeaderWithSemantic();
+
+        // Assert
+        var seqId = TestHelpers.ExtractId(nav);
+        var semId = TestHelpers.ExtractId(header);
+
+        Assert.NotNull(seqId);
+        Assert.NotNull(semId);
+        Assert.NotEqual(seqId, semId);
+
+        // Sequential should be all digits
+        Assert.True(seqId.All(char.IsDigit), $"Sequential ID '{seqId}' should be all digits");
+        // Semantic should contain letters and dashes
+        Assert.Contains("-", semId);
+        Assert.True(semId.Any(char.IsLetter), $"Semantic ID '{semId}' should contain letters");
     }
 }

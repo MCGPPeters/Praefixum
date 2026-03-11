@@ -5,6 +5,41 @@ All notable changes to Praefixum are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-03-11
+
+### Added
+
+- **Sequential format** (`UniqueIdFormat.Sequential`) — 6-digit deterministic number derived from call site
+- **Semantic format** (`UniqueIdFormat.Semantic`) — kebab-case method name + short hash (e.g. `create-button-a3f2`)
+- **Instance method interception** — `[UniqueId]` now works on instance methods via generated extension-method-style interceptors
+- **Compiler diagnostics** for attribute misuse:
+  - `PRAEF001` (Warning): `[UniqueId]` on a non-string parameter
+  - `PRAEF002` (Warning): `[UniqueId]` on a non-nullable string parameter
+  - `PRAEF003` (Info): `[UniqueId]` parameter without a default value
+- New test suites: `UniqueIdInstanceMethodTests`, `UniqueIdDiagnosticTests`
+- Tests for Sequential and Semantic formats in `UniqueIdAttributeTests`
+- Tests for `ulong`, `decimal`, and `enum` default value emission in `UniqueIdGeneratorDefaultValueTests`
+- Demo methods `Badge` (Sequential) and `Alert` (Semantic) in `Html.cs` / `Program.cs`
+
+### Changed
+
+- **Removed `deterministic` parameter** from `UniqueIdAttribute` — the library is deterministic by design; the parameter was unused
+- ID generation methods (`ShortHash`, `DeterministicGuid`, `DeterministicTimestamp`, `HtmlSafeId`) changed from `public` to `internal`
+- `DevelopmentDependency` set to `true` in NuGet package metadata (source generators should not be a runtime dependency)
+- Deduplicated ID generation logic: `TestHelpers.cs` now calls internal generator methods via `InternalsVisibleTo` instead of maintaining private copies
+- Consolidated duplicate `ExtractId` helpers across test files into `TestHelpers.ExtractId`
+- Updated all documentation to version 2.1.0
+
+### Fixed
+
+- Removed global `<NoWarn>CS8602</NoWarn>` suppression from `Praefixum.csproj`
+- Removed duplicate `EmitCompilerGeneratedFiles` property in `Praefixum.Tests.csproj`
+- Removed unused empty `_._` packaging artifact
+- Fixed `.vscode/tasks.json` and `launch.json` referencing old project names and .NET 8.0
+- Fixed `CONTRIBUTING.md` duplicated/outdated content
+
+---
+
 ## [2.0.1] - 2026-02-25
 
 ### Fixed
