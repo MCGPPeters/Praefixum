@@ -44,7 +44,7 @@ jobs:
       run: dotnet build Praefixum.sln --configuration Release --no-restore /p:Version=${{ steps.gitversion.outputs.semVer }}
       
     - name: Test
-      run: dotnet test Praefixum.Tests/Praefixum.Tests.csproj --configuration Release --no-build --verbosity normal
+      run: dotnet test --project Praefixum.Tests/Praefixum.Tests.csproj --configuration Release --no-build --verbosity normal
       
     - name: Pack
       run: dotnet pack Praefixum/Praefixum.csproj --configuration Release --no-build --output nuget-packages /p:Version=${{ steps.gitversion.outputs.semVer }}
