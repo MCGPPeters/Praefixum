@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Praefixum.Tests;
 
 /// <summary>
@@ -8,106 +6,106 @@ namespace Praefixum.Tests;
 /// </summary>
 public class UniqueIdAttributeTests
 {
-    [Fact]
-    public void CreateDiv_WithUniqueIdAttribute_GeneratesUniqueId()
+    [Test]
+    public async Task CreateDiv_WithUniqueIdAttribute_GeneratesUniqueId()
     {
         // Act
         var result1 = TestHelpers.CreateDiv();
         var result2 = TestHelpers.CreateDiv();
 
         // Assert
-        Assert.NotEqual(result1, result2);
-        Assert.Contains("id=\"", result1);
-        Assert.Contains("id=\"", result2);
+        await Assert.That(result1).IsNotEqualTo(result2);
+        await Assert.That(result1).Contains("id=\"");
+        await Assert.That(result2).Contains("id=\"");
         
         var id1 = TestHelpers.ExtractId(result1);
         var id2 = TestHelpers.ExtractId(result2);
-        Assert.NotNull(id1);
-        Assert.NotNull(id2);
-        Assert.NotEqual(id1, id2);
+        await Assert.That(id1).IsNotNull();
+        await Assert.That(id2).IsNotNull();
+        await Assert.That(id1).IsNotEqualTo(id2);
     }
 
-    [Fact]
-    public void CreateDiv_WithExplicitId_UsesProvidedId()
+    [Test]
+    public async Task CreateDiv_WithExplicitId_UsesProvidedId()
     {
         // Act
         var result = TestHelpers.CreateDiv("explicit-div-id", "content");
 
         // Assert
-        Assert.Equal("<div id=\"explicit-div-id\">content</div>", result);
+        await Assert.That(result).IsEqualTo("<div id=\"explicit-div-id\">content</div>");
     }
 
-    [Fact]
-    public void CreateButtonWithGuid_GeneratesGuidFormatId()
+    [Test]
+    public async Task CreateButtonWithGuid_GeneratesGuidFormatId()
     {
         // Act
         var result = TestHelpers.CreateButtonWithGuid();
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.Equal(32, id.Length); // GUID without dashes should be 32 characters
-        Assert.True(id.All(c => char.IsLetterOrDigit(c)));
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!.Length).IsEqualTo(32); // GUID without dashes should be 32 characters
+        await Assert.That(id.All(c => char.IsLetterOrDigit(c))).IsTrue();
     }
 
-    [Fact]
-    public void CreateInputWithHtmlId_GeneratesHtmlSafeId()
+    [Test]
+    public async Task CreateInputWithHtmlId_GeneratesHtmlSafeId()
     {
         // Act
         var result = TestHelpers.CreateInputWithHtmlId();
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.True(id.Length >= 4); // HTML IDs should be reasonably short
-        Assert.True(id.All(c => char.IsLetterOrDigit(c) || c == '-' || c == '_'));
-        Assert.True(TestHelpers.IsValidHtmlId(id));
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!.Length >= 4).IsTrue(); // HTML IDs should be reasonably short
+        await Assert.That(id.All(c => char.IsLetterOrDigit(c) || c == '-' || c == '_')).IsTrue();
+        await Assert.That(TestHelpers.IsValidHtmlId(id)).IsTrue();
     }
 
-    [Fact]
-    public void CreateSpanWithPrefix_IncludesPrefix()
+    [Test]
+    public async Task CreateSpanWithPrefix_IncludesPrefix()
     {
         // Act
         var result = TestHelpers.CreateSpanWithPrefix();
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.StartsWith("span-", id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).StartsWith("span-");
     }
 
-    [Fact]
-    public void CreateSectionWithTimestamp_GeneratesTimestampBasedId()
+    [Test]
+    public async Task CreateSectionWithTimestamp_GeneratesTimestampBasedId()
     {
         // Act
         var result = TestHelpers.CreateSectionWithTimestamp();
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.NotEmpty(id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).IsNotEmpty();
         // Timestamp-based IDs should be different when called at different times
         Thread.Sleep(1);
         var result2 = TestHelpers.CreateSectionWithTimestamp();
         var id2 = TestHelpers.ExtractId(result2);
-        Assert.NotEqual(id, id2);
+        await Assert.That(id).IsNotEqualTo(id2);
     }
 
-    [Fact]
-    public void CreateArticleWithShortHash_GeneratesShortHashId()
+    [Test]
+    public async Task CreateArticleWithShortHash_GeneratesShortHashId()
     {
         // Act
         var result = TestHelpers.CreateArticleWithShortHash();
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.NotEmpty(id);
-        Assert.True(id.Length <= 16); // Short hash should be reasonably short
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).IsNotEmpty();
+        await Assert.That(id.Length <= 16).IsTrue(); // Short hash should be reasonably short
     }
 
-    [Fact]
-    public void CreateFormWithMultipleIds_GeneratesDifferentIdsForEachParameter()
+    [Test]
+    public async Task CreateFormWithMultipleIds_GeneratesDifferentIdsForEachParameter()
     {
         // Act
         var result = TestHelpers.CreateFormWithMultipleIds();
@@ -118,10 +116,10 @@ public class UniqueIdAttributeTests
         var emailInputIdMatch = System.Text.RegularExpressions.Regex.Match(result, @"<input id=""([^""]+)"" type=""email""");
         var buttonIdMatch = System.Text.RegularExpressions.Regex.Match(result, @"<button id=""([^""]+)""");
 
-        Assert.True(formIdMatch.Success);
-        Assert.True(nameInputIdMatch.Success);
-        Assert.True(emailInputIdMatch.Success);
-        Assert.True(buttonIdMatch.Success);
+        await Assert.That(formIdMatch.Success).IsTrue();
+        await Assert.That(nameInputIdMatch.Success).IsTrue();
+        await Assert.That(emailInputIdMatch.Success).IsTrue();
+        await Assert.That(buttonIdMatch.Success).IsTrue();
 
         var formId = formIdMatch.Groups[1].Value;
         var nameInputId = nameInputIdMatch.Groups[1].Value;
@@ -129,66 +127,66 @@ public class UniqueIdAttributeTests
         var buttonId = buttonIdMatch.Groups[1].Value;
 
         // All IDs should be different
-        Assert.NotEqual(formId, nameInputId);
-        Assert.NotEqual(formId, emailInputId);
-        Assert.NotEqual(formId, buttonId);
-        Assert.NotEqual(nameInputId, emailInputId);
-        Assert.NotEqual(nameInputId, buttonId);
-        Assert.NotEqual(emailInputId, buttonId);
+        await Assert.That(formId).IsNotEqualTo(nameInputId);
+        await Assert.That(formId).IsNotEqualTo(emailInputId);
+        await Assert.That(formId).IsNotEqualTo(buttonId);
+        await Assert.That(nameInputId).IsNotEqualTo(emailInputId);
+        await Assert.That(nameInputId).IsNotEqualTo(buttonId);
+        await Assert.That(emailInputId).IsNotEqualTo(buttonId);
 
         // Form ID should have prefix
-        Assert.StartsWith("form-", formId);
+        await Assert.That(formId).StartsWith("form-");
 
         // Button ID should be GUID format (32 characters)
-        Assert.Equal(32, buttonId.Length);
+        await Assert.That(buttonId.Length).IsEqualTo(32);
     }
 
-    [Fact]
-    public void GetIdForElement_ReturnsGeneratedId()
+    [Test]
+    public async Task GetIdForElement_ReturnsGeneratedId()
     {
         // Act
         var id = TestHelpers.GetIdForElement();
 
         // Assert
-        Assert.NotNull(id);
-        Assert.NotEmpty(id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id).IsNotEmpty();
     }
 
-    [Fact]
-    public void GetHashFromId_ReturnsHashOfGeneratedId()
+    [Test]
+    public async Task GetHashFromId_ReturnsHashOfGeneratedId()
     {
         // Act
         var hash1 = TestHelpers.GetHashFromId();
         var hash2 = TestHelpers.GetHashFromId();
 
         // Assert
-        Assert.NotEqual(0, hash1);
-        Assert.NotEqual(0, hash2);
-        Assert.NotEqual(hash1, hash2); // Should be different because IDs are different
+        await Assert.That(hash1).IsNotEqualTo(0);
+        await Assert.That(hash2).IsNotEqualTo(0);
+        await Assert.That(hash1).IsNotEqualTo(hash2); // Should be different because IDs are different
     }
 
-    [Fact]
-    public void IsValidId_ReturnsTrueForGeneratedId()
+    [Test]
+    public async Task IsValidId_ReturnsTrueForGeneratedId()
     {
         // Act
         var isValid = TestHelpers.IsValidId();
 
         // Assert
-        Assert.True(isValid);
+        await Assert.That(isValid).IsTrue();
     }
 
-    [Fact]
-    public void ProcessElementWithId_StoresGeneratedId()
+    [Test]
+    public async Task ProcessElementWithId_StoresGeneratedId()
     {
         // Act
         TestHelpers.ProcessElementWithId();
 
         // Assert
-        Assert.NotNull(TestHelpers.LastProcessedId);
-        Assert.StartsWith("process-", TestHelpers.LastProcessedId);
+        await Assert.That(TestHelpers.LastProcessedId).IsNotNull();
+        await Assert.That(TestHelpers.LastProcessedId!).StartsWith("process-");
     }
 
-    [Fact]
+    [Test]
     public async Task CreateElementAsync_GeneratesUniqueIdInAsyncMethod()
     {
         // Act
@@ -196,45 +194,45 @@ public class UniqueIdAttributeTests
         var result2 = await TestHelpers.CreateElementAsync();
 
         // Assert
-        Assert.NotEqual(result1, result2);
+        await Assert.That(result1).IsNotEqualTo(result2);
         var id1 = TestHelpers.ExtractId(result1);
         var id2 = TestHelpers.ExtractId(result2);
-        Assert.NotNull(id1);
-        Assert.NotNull(id2);
-        Assert.NotEqual(id1, id2);
+        await Assert.That(id1).IsNotNull();
+        await Assert.That(id2).IsNotNull();
+        await Assert.That(id1).IsNotEqualTo(id2);
     }
 
-    [Fact]
-    public void CreateListWithId_GeneratesIdForGenericMethod()
+    [Test]
+    public async Task CreateListWithId_GeneratesIdForGenericMethod()
     {
         // Act
         var list = TestHelpers.CreateListWithId(["item1", "item2", "item3"]);
 
         // Assert
-        Assert.Equal(3, list.Count);
-        Assert.NotNull(TestHelpers.LastGeneratedId);
-        Assert.NotEmpty(TestHelpers.LastGeneratedId);
+        await Assert.That(list.Count).IsEqualTo(3);
+        await Assert.That(TestHelpers.LastGeneratedId).IsNotNull();
+        await Assert.That(TestHelpers.LastGeneratedId!).IsNotEmpty();
     }
 
-    [Fact]
-    public void CreateComplexElement_GeneratesIdForSingleParameter()
+    [Test]
+    public async Task CreateComplexElement_GeneratesIdForSingleParameter()
     {
         // Act
         var result = TestHelpers.CreateComplexElement("p", className: "test-class", content: "Hello World");
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.Contains("class=\"test-class\"", result);
-        Assert.Contains("Hello World", result);
-        Assert.StartsWith("<p", result);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(result).Contains("class=\"test-class\"");
+        await Assert.That(result).Contains("Hello World");
+        await Assert.That(result).StartsWith("<p");
     }
 
-    [Theory]
-    [InlineData(5)]
-    [InlineData(10)]
-    [InlineData(20)]
-    public void MultipleCallsWithUniqueId_AreDeterministic(int count)
+    [Test]
+    [Arguments(5)]
+    [Arguments(10)]
+    [Arguments(20)]
+    public async Task MultipleCallsWithUniqueId_AreDeterministic(int count)
     {
         // Act
         var ids = new HashSet<string>();
@@ -242,16 +240,16 @@ public class UniqueIdAttributeTests
         {
             var result = TestHelpers.CreateDiv();
             var id = TestHelpers.ExtractId(result);
-            Assert.NotNull(id);
-            ids.Add(id);
+            await Assert.That(id).IsNotNull();
+            ids.Add(id!);
         }
 
         // Assert
-        Assert.Single(ids);
+        await Assert.That(ids).HasSingleItem();
     }
 
-    [Fact]
-    public void DifferentFormats_GenerateDifferentStyleIds()
+    [Test]
+    public async Task DifferentFormats_GenerateDifferentStyleIds()
     {
         // Act
         var guidButton = TestHelpers.CreateButtonWithGuid();
@@ -263,23 +261,23 @@ public class UniqueIdAttributeTests
         var htmlId = TestHelpers.ExtractId(htmlInput);
         var prefixedId = TestHelpers.ExtractId(prefixedSpan);
 
-        Assert.NotNull(guidId);
-        Assert.NotNull(htmlId);
-        Assert.NotNull(prefixedId);
+        await Assert.That(guidId).IsNotNull();
+        await Assert.That(htmlId).IsNotNull();
+        await Assert.That(prefixedId).IsNotNull();
 
         // GUID format should be 32 characters
-        Assert.Equal(32, guidId.Length);
+        await Assert.That(guidId!.Length).IsEqualTo(32);
 
         // HTML ID should be shorter and HTML-safe
-        Assert.True(htmlId.Length < guidId.Length);
-        Assert.True(TestHelpers.IsValidHtmlId(htmlId));
+        await Assert.That(htmlId!.Length < guidId.Length).IsTrue();
+        await Assert.That(TestHelpers.IsValidHtmlId(htmlId)).IsTrue();
 
         // Prefixed ID should start with prefix
-        Assert.StartsWith("span-", prefixedId);
+        await Assert.That(prefixedId!).StartsWith("span-");
     }
 
-    [Fact]
-    public void ExplicitIds_AreNotOverridden()
+    [Test]
+    public async Task ExplicitIds_AreNotOverridden()
     {
         // Act
         var divResult = TestHelpers.CreateDiv("my-explicit-div-id");
@@ -287,31 +285,31 @@ public class UniqueIdAttributeTests
         var inputResult = TestHelpers.CreateInputWithHtmlId("my-explicit-input-id");
 
         // Assert
-        Assert.Contains("my-explicit-div-id", divResult);
-        Assert.Contains("my-explicit-button-id", buttonResult);
-        Assert.Contains("my-explicit-input-id", inputResult);
+        await Assert.That(divResult).Contains("my-explicit-div-id");
+        await Assert.That(buttonResult).Contains("my-explicit-button-id");
+        await Assert.That(inputResult).Contains("my-explicit-input-id");
     }
 
     // ==========================================
     // TESTS FOR NEW Sequential AND Semantic FORMATS
     // ==========================================
 
-    [Fact]
-    public void CreateNavWithSequential_GeneratesSequentialFormatId()
+    [Test]
+    public async Task CreateNavWithSequential_GeneratesSequentialFormatId()
     {
         // Act
         var result = TestHelpers.CreateNavWithSequential();
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.NotEmpty(id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).IsNotEmpty();
         // Sequential format should be a 6-digit zero-padded number
-        Assert.Matches(@"^\d{6}$", id);
+        await Assert.That(id).Matches(@"^\d{6}$");
     }
 
-    [Fact]
-    public void CreateNavWithSequential_IsDeterministicPerCallSite()
+    [Test]
+    public async Task CreateNavWithSequential_IsDeterministicPerCallSite()
     {
         // Act
         var ids = new HashSet<string>();
@@ -319,16 +317,16 @@ public class UniqueIdAttributeTests
         {
             var result = TestHelpers.CreateNavWithSequential();
             var id = TestHelpers.ExtractId(result);
-            Assert.NotNull(id);
-            ids.Add(id);
+            await Assert.That(id).IsNotNull();
+            ids.Add(id!);
         }
 
         // Assert — same call site should produce the same ID
-        Assert.Single(ids);
+        await Assert.That(ids).HasSingleItem();
     }
 
-    [Fact]
-    public void CreateNavWithSequential_DifferentCallSites_ProduceDifferentIds()
+    [Test]
+    public async Task CreateNavWithSequential_DifferentCallSites_ProduceDifferentIds()
     {
         // Act — two distinct call sites
         var nav1 = TestHelpers.CreateNavWithSequential();
@@ -337,40 +335,40 @@ public class UniqueIdAttributeTests
         // Assert
         var id1 = TestHelpers.ExtractId(nav1);
         var id2 = TestHelpers.ExtractId(nav2);
-        Assert.NotNull(id1);
-        Assert.NotNull(id2);
-        Assert.NotEqual(id1, id2);
+        await Assert.That(id1).IsNotNull();
+        await Assert.That(id2).IsNotNull();
+        await Assert.That(id1).IsNotEqualTo(id2);
     }
 
-    [Fact]
-    public void CreateNavWithSequential_WithExplicitId_UsesProvidedId()
+    [Test]
+    public async Task CreateNavWithSequential_WithExplicitId_UsesProvidedId()
     {
         // Act
         var result = TestHelpers.CreateNavWithSequential("my-nav-id");
 
         // Assert
-        Assert.Contains("my-nav-id", result);
+        await Assert.That(result).Contains("my-nav-id");
     }
 
-    [Fact]
-    public void CreateHeaderWithSemantic_GeneratesSemanticFormatId()
+    [Test]
+    public async Task CreateHeaderWithSemantic_GeneratesSemanticFormatId()
     {
         // Act
         var result = TestHelpers.CreateHeaderWithSemantic();
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.NotEmpty(id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).IsNotEmpty();
         // Semantic format should be kebab-case-fragment-hash e.g. "create-header-with-semantic-a3f2"
-        Assert.Contains("-", id);
+        await Assert.That(id).Contains("-");
         // Should end with a short hash (4 hex-like chars)
         var parts = id.Split('-');
-        Assert.True(parts.Length >= 2, $"Semantic ID '{id}' should have at least 2 parts separated by '-'");
+        await Assert.That(parts.Length >= 2).IsTrue().Because($"Semantic ID '{id}' should have at least 2 parts separated by '-'");
     }
 
-    [Fact]
-    public void CreateHeaderWithSemantic_IsDeterministicPerCallSite()
+    [Test]
+    public async Task CreateHeaderWithSemantic_IsDeterministicPerCallSite()
     {
         // Act
         var ids = new HashSet<string>();
@@ -378,16 +376,16 @@ public class UniqueIdAttributeTests
         {
             var result = TestHelpers.CreateHeaderWithSemantic();
             var id = TestHelpers.ExtractId(result);
-            Assert.NotNull(id);
-            ids.Add(id);
+            await Assert.That(id).IsNotNull();
+            ids.Add(id!);
         }
 
         // Assert — same call site should produce the same ID
-        Assert.Single(ids);
+        await Assert.That(ids).HasSingleItem();
     }
 
-    [Fact]
-    public void CreateHeaderWithSemantic_DifferentCallSites_ProduceDifferentIds()
+    [Test]
+    public async Task CreateHeaderWithSemantic_DifferentCallSites_ProduceDifferentIds()
     {
         // Act — two distinct call sites
         var header1 = TestHelpers.CreateHeaderWithSemantic();
@@ -396,23 +394,23 @@ public class UniqueIdAttributeTests
         // Assert
         var id1 = TestHelpers.ExtractId(header1);
         var id2 = TestHelpers.ExtractId(header2);
-        Assert.NotNull(id1);
-        Assert.NotNull(id2);
-        Assert.NotEqual(id1, id2);
+        await Assert.That(id1).IsNotNull();
+        await Assert.That(id2).IsNotNull();
+        await Assert.That(id1).IsNotEqualTo(id2);
     }
 
-    [Fact]
-    public void CreateHeaderWithSemantic_WithExplicitId_UsesProvidedId()
+    [Test]
+    public async Task CreateHeaderWithSemantic_WithExplicitId_UsesProvidedId()
     {
         // Act
         var result = TestHelpers.CreateHeaderWithSemantic("my-header-id");
 
         // Assert
-        Assert.Contains("my-header-id", result);
+        await Assert.That(result).Contains("my-header-id");
     }
 
-    [Fact]
-    public void SequentialAndSemantic_ProduceDifferentStyleIds()
+    [Test]
+    public async Task SequentialAndSemantic_ProduceDifferentStyleIds()
     {
         // Act
         var nav = TestHelpers.CreateNavWithSequential();
@@ -422,14 +420,14 @@ public class UniqueIdAttributeTests
         var seqId = TestHelpers.ExtractId(nav);
         var semId = TestHelpers.ExtractId(header);
 
-        Assert.NotNull(seqId);
-        Assert.NotNull(semId);
-        Assert.NotEqual(seqId, semId);
+        await Assert.That(seqId).IsNotNull();
+        await Assert.That(semId).IsNotNull();
+        await Assert.That(seqId).IsNotEqualTo(semId);
 
         // Sequential should be all digits
-        Assert.True(seqId.All(char.IsDigit), $"Sequential ID '{seqId}' should be all digits");
+        await Assert.That(seqId!.All(char.IsDigit)).IsTrue().Because($"Sequential ID '{seqId}' should be all digits");
         // Semantic should contain letters and dashes
-        Assert.Contains("-", semId);
-        Assert.True(semId.Any(char.IsLetter), $"Semantic ID '{semId}' should contain letters");
+        await Assert.That(semId!).Contains("-");
+        await Assert.That(semId.Any(char.IsLetter)).IsTrue().Because($"Semantic ID '{semId}' should contain letters");
     }
 }

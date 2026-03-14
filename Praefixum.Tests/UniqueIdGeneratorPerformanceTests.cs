@@ -1,5 +1,4 @@
 using System;
-using Xunit;
 
 namespace Praefixum.Tests;
 
@@ -8,8 +7,8 @@ namespace Praefixum.Tests;
 /// </summary>
 public class UniqueIdGeneratorPerformanceTests
 {
-    [Fact]
-    public void GenerateId_Performance_CompletesQuickly()
+    [Test]
+    public async Task GenerateId_Performance_CompletesQuickly()
     {
         // Arrange
         const int iterations = 1000;
@@ -26,15 +25,15 @@ public class UniqueIdGeneratorPerformanceTests
         stopwatch.Stop();
         
         // Assert - Should complete in under 1 second for 1000 iterations
-        Assert.True(stopwatch.ElapsedMilliseconds < 1000, 
-            $"Performance test took {stopwatch.ElapsedMilliseconds}ms for {iterations} iterations");
+        await Assert.That(stopwatch.ElapsedMilliseconds < 1000).IsTrue()
+            .Because($"Performance test took {stopwatch.ElapsedMilliseconds}ms for {iterations} iterations");
     }
 
-    [Theory]
-    [InlineData(100)]
-    [InlineData(500)]
-    [InlineData(1000)]
-    public void GenerateId_ScalabilityTest_HandlesLargeVolumes(int count)
+    [Test]
+    [Arguments(100)]
+    [Arguments(500)]
+    [Arguments(1000)]
+    public async Task GenerateId_ScalabilityTest_HandlesLargeVolumes(int count)
     {
         // Arrange
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -51,16 +50,16 @@ public class UniqueIdGeneratorPerformanceTests
         stopwatch.Stop();
         
         // Assert
-        Assert.Equal(count, ids.Count);
-        Assert.Single(ids.Distinct());
+        await Assert.That(ids.Count).IsEqualTo(count);
+        await Assert.That(ids.Distinct()).HasSingleItem();
         
         // Performance should scale linearly (generous bounds)
         var maxExpectedMs = count * 2; // 2ms per operation is very generous
-        Assert.True(stopwatch.ElapsedMilliseconds < maxExpectedMs,
-            $"Scalability test for {count} items took {stopwatch.ElapsedMilliseconds}ms (expected < {maxExpectedMs}ms)");
+        await Assert.That(stopwatch.ElapsedMilliseconds < maxExpectedMs).IsTrue()
+            .Because($"Scalability test for {count} items took {stopwatch.ElapsedMilliseconds}ms (expected < {maxExpectedMs}ms)");
     }
 
-    [Fact]
+    [Test]
     public async Task GenerateId_ConcurrentPerformance_HandlesParallelLoad()
     {
         // Arrange
@@ -90,16 +89,16 @@ public class UniqueIdGeneratorPerformanceTests
         var allIds = results.SelectMany(ids => ids).ToList();
         var expectedCount = concurrentTasks * operationsPerTask;
         
-        Assert.Equal(expectedCount, allIds.Count);
-        Assert.Single(allIds.Distinct());
+        await Assert.That(allIds.Count).IsEqualTo(expectedCount);
+        await Assert.That(allIds.Distinct()).HasSingleItem();
         
         // Should complete concurrent operations quickly
-        Assert.True(stopwatch.ElapsedMilliseconds < 5000,
-            $"Concurrent performance test took {stopwatch.ElapsedMilliseconds}ms for {expectedCount} operations");
+        await Assert.That(stopwatch.ElapsedMilliseconds < 5000).IsTrue()
+            .Because($"Concurrent performance test took {stopwatch.ElapsedMilliseconds}ms for {expectedCount} operations");
     }
 
-    [Fact]
-    public void GenerateId_MemoryUsage_RemainsConstant()
+    [Test]
+    public async Task GenerateId_MemoryUsage_RemainsConstant()
     {
         // Arrange
         var initialMemory = GC.GetTotalMemory(true);
@@ -124,12 +123,12 @@ public class UniqueIdGeneratorPerformanceTests
         var memoryGrowth = memoryMeasurements.Last() - memoryMeasurements.First();
         var maxAllowedGrowth = 5 * 1024 * 1024; // 5MB
         
-        Assert.True(memoryGrowth < maxAllowedGrowth,
-            $"Memory grew by {memoryGrowth / 1024.0 / 1024.0:F2} MB over 1000 operations");
+        await Assert.That(memoryGrowth < maxAllowedGrowth).IsTrue()
+            .Because($"Memory grew by {memoryGrowth / 1024.0 / 1024.0:F2} MB over 1000 operations");
     }
 
-    [Fact]
-    public void GenerateId_GuidFormat_PerformanceComparison()
+    [Test]
+    public async Task GenerateId_GuidFormat_PerformanceComparison()
     {
         // Arrange
         const int iterations = 1000;
@@ -160,18 +159,18 @@ public class UniqueIdGeneratorPerformanceTests
         stopwatch.Stop();
         
         // Assert
-        Assert.Equal(iterations, guidIds.Count);
-        Assert.Equal(iterations, htmlIds.Count);
-        Assert.Single(guidIds.Distinct());
-        Assert.Single(htmlIds.Distinct());
+        await Assert.That(guidIds.Count).IsEqualTo(iterations);
+        await Assert.That(htmlIds.Count).IsEqualTo(iterations);
+        await Assert.That(guidIds.Distinct()).HasSingleItem();
+        await Assert.That(htmlIds.Distinct()).HasSingleItem();
         
         // Both should be reasonably fast (under 500ms for 1000 operations)
-        Assert.True(guidTime < 500, $"GUID format took {guidTime}ms");
-        Assert.True(htmlTime < 500, $"HtmlId format took {htmlTime}ms");
+        await Assert.That(guidTime < 500).IsTrue().Because($"GUID format took {guidTime}ms");
+        await Assert.That(htmlTime < 500).IsTrue().Because($"HtmlId format took {htmlTime}ms");
     }
 
-    [Fact]
-    public void GenerateId_PrefixHandling_DoesNotDegradePerformance()
+    [Test]
+    public async Task GenerateId_PrefixHandling_DoesNotDegradePerformance()
     {
         // Arrange
         const int iterations = 500;
@@ -196,7 +195,7 @@ public class UniqueIdGeneratorPerformanceTests
         stopwatch.Stop();
         // Assert - Prefix handling should not add excessive overhead (allow up to 10x)
         var overheadRatio = (double)prefixTicks / Math.Max(1, noPrefixTicks);
-        Assert.True(overheadRatio < 10.0, 
-            $"Prefix handling adds {overheadRatio:F2}x overhead ({prefixTicks} ticks vs {noPrefixTicks} ticks)");
+        await Assert.That(overheadRatio < 10.0).IsTrue()
+            .Because($"Prefix handling adds {overheadRatio:F2}x overhead ({prefixTicks} ticks vs {noPrefixTicks} ticks)");
     }
 }
