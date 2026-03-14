@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Praefixum.Tests;
 
 /// <summary>
@@ -13,173 +11,173 @@ public class UniqueIdGeneratorDefaultValueTests
     // bool defaults — the primary reported bug
     // ==========================================
 
-    [Fact]
-    public void BoolDefaultFalse_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task BoolDefaultFalse_CompilesAndRunsCorrectly()
     {
         // If the generator emits "False" instead of "false", this won't compile at all.
         var result = TestHelpers.CreateInputText("Name");
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("placeholder=\"Name\"", result);
-        Assert.DoesNotContain("required", result); // isRequired defaults to false
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("placeholder=\"Name\"");
+        await Assert.That(result).DoesNotContain("required"); // isRequired defaults to false
     }
 
-    [Fact]
-    public void BoolDefaultFalse_WithExplicitTrue_Works()
+    [Test]
+    public async Task BoolDefaultFalse_WithExplicitTrue_Works()
     {
         var result = TestHelpers.CreateInputText("Name", isRequired: true);
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("required", result);
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("required");
     }
 
-    [Fact]
-    public void BoolDefaultTrue_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task BoolDefaultTrue_CompilesAndRunsCorrectly()
     {
         // If the generator emits "True" instead of "true", this won't compile at all.
         var result = TestHelpers.CreateCheckbox("Remember me");
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("checked", result); // isChecked defaults to true
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("checked"); // isChecked defaults to true
     }
 
-    [Fact]
-    public void BoolDefaultTrue_WithExplicitFalse_Works()
+    [Test]
+    public async Task BoolDefaultTrue_WithExplicitFalse_Works()
     {
         var result = TestHelpers.CreateCheckbox("Remember me", isChecked: false);
         
-        Assert.Contains("id=\"", result);
-        Assert.DoesNotContain("checked", result);
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).DoesNotContain("checked");
     }
 
     // ==========================================
     // char defaults
     // ==========================================
 
-    [Fact]
-    public void CharDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task CharDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreateElementWithSeparator("hello");
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("hello-hello", result); // separator defaults to '-'
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("hello-hello"); // separator defaults to '-'
     }
 
-    [Fact]
-    public void CharDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task CharDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreateElementWithSeparator("hello", separator: '|');
         
-        Assert.Contains("hello|hello", result);
+        await Assert.That(result).Contains("hello|hello");
     }
 
     // ==========================================
     // float defaults
     // ==========================================
 
-    [Fact]
-    public void FloatDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task FloatDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreateProgressBar();
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("value=\"0\"", result); // progress defaults to 0.0f
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("value=\"0\""); // progress defaults to 0.0f
     }
 
-    [Fact]
-    public void FloatDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task FloatDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreateProgressBar(progress: 0.75f);
         
-        Assert.Contains("id=\"", result);
+        await Assert.That(result).Contains("id=\"");
         // Float formatting is locale-dependent at runtime; just verify the value is present
-        Assert.Contains(0.75f.ToString(), result);
+        await Assert.That(result).Contains(0.75f.ToString());
     }
 
     // ==========================================
     // double defaults
     // ==========================================
 
-    [Fact]
-    public void DoubleDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task DoubleDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreateMeter();
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("value=\"0\"", result); // value defaults to 0.0d
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("value=\"0\""); // value defaults to 0.0d
     }
 
-    [Fact]
-    public void DoubleDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task DoubleDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreateMeter(value: 42.5, max: 200.0);
         
-        Assert.Contains("id=\"", result);
+        await Assert.That(result).Contains("id=\"");
         // Double formatting is locale-dependent at runtime; just verify the values are present
-        Assert.Contains(42.5d.ToString(), result);
-        Assert.Contains(200d.ToString(), result);
+        await Assert.That(result).Contains(42.5d.ToString());
+        await Assert.That(result).Contains(200d.ToString());
     }
 
     // ==========================================
     // long defaults
     // ==========================================
 
-    [Fact]
-    public void LongDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task LongDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreateDataElement();
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("value=\"0\"", result); // dataValue defaults to 0L
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("value=\"0\""); // dataValue defaults to 0L
     }
 
-    [Fact]
-    public void LongDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task LongDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreateDataElement(dataValue: 9876543210L);
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("9876543210", result);
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("9876543210");
     }
 
     // ==========================================
     // int defaults (sanity check — should have worked before)
     // ==========================================
 
-    [Fact]
-    public void IntDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task IntDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreateOrderedItem("Item");
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("data-order=\"0\"", result); // order defaults to 0
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("data-order=\"0\""); // order defaults to 0
     }
 
-    [Fact]
-    public void IntDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task IntDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreateOrderedItem("Item", order: 5);
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("data-order=\"5\"", result);
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("data-order=\"5\"");
     }
 
     // ==========================================
     // Determinism checks — IDs are still deterministic per call site
     // ==========================================
 
-    [Fact]
-    public void BoolDefaultMethod_GeneratesDeterministicId()
+    [Test]
+    public async Task BoolDefaultMethod_GeneratesDeterministicId()
     {
         // Same call site (same source line) should produce the same deterministic ID
         var results = Enumerable.Range(0, 5).Select(_ => TestHelpers.CreateInputText("Name")).ToList();
         
-        Assert.True(results.All(r => r == results[0]),
-            "Multiple invocations from the same call site should produce identical results");
+        await Assert.That(results.All(r => r == results[0])).IsTrue()
+            .Because("Multiple invocations from the same call site should produce identical results");
     }
 
-    [Fact]
-    public void DifferentDefaultTypeMethods_GenerateUniqueIds()
+    [Test]
+    public async Task DifferentDefaultTypeMethods_GenerateUniqueIds()
     {
         var input = TestHelpers.CreateInputText("Name");
         var checkbox = TestHelpers.CreateCheckbox("Check");
@@ -189,80 +187,80 @@ public class UniqueIdGeneratorDefaultValueTests
         var checkboxId = TestHelpers.ExtractId(checkbox);
         var progressId = TestHelpers.ExtractId(progress);
         
-        Assert.NotNull(inputId);
-        Assert.NotNull(checkboxId);
-        Assert.NotNull(progressId);
+        await Assert.That(inputId).IsNotNull();
+        await Assert.That(checkboxId).IsNotNull();
+        await Assert.That(progressId).IsNotNull();
         
-        // Different call sites → different IDs
-        Assert.NotEqual(inputId, checkboxId);
-        Assert.NotEqual(inputId, progressId);
-        Assert.NotEqual(checkboxId, progressId);
+        // Different call sites -> different IDs
+        await Assert.That(inputId).IsNotEqualTo(checkboxId);
+        await Assert.That(inputId).IsNotEqualTo(progressId);
+        await Assert.That(checkboxId).IsNotEqualTo(progressId);
     }
 
     // ==========================================
     // ulong defaults
     // ==========================================
 
-    [Fact]
-    public void UlongDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task UlongDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreateUlongElement();
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("data-counter=\"0\"", result); // counter defaults to 0UL
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("data-counter=\"0\""); // counter defaults to 0UL
     }
 
-    [Fact]
-    public void UlongDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task UlongDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreateUlongElement(counter: 18446744073709551615UL);
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("18446744073709551615", result);
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("18446744073709551615");
     }
 
     // ==========================================
     // decimal defaults
     // ==========================================
 
-    [Fact]
-    public void DecimalDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task DecimalDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreatePriceElement();
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("data-price=\"0.0\"", result); // price defaults to 0.0m
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("data-price=\"0.0\""); // price defaults to 0.0m
     }
 
-    [Fact]
-    public void DecimalDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task DecimalDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreatePriceElement(price: 99.99m);
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("99.99", result);
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("99.99");
     }
 
     // ==========================================
     // enum defaults
     // ==========================================
 
-    [Fact]
-    public void EnumDefault_CompilesAndRunsCorrectly()
+    [Test]
+    public async Task EnumDefault_CompilesAndRunsCorrectly()
     {
         var result = TestHelpers.CreateAlignedElement("text");
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("data-comparison=\"Ordinal\"", result); // defaults to StringComparison.Ordinal
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("data-comparison=\"Ordinal\""); // defaults to StringComparison.Ordinal
     }
 
-    [Fact]
-    public void EnumDefault_WithExplicitValue_Works()
+    [Test]
+    public async Task EnumDefault_WithExplicitValue_Works()
     {
         var result = TestHelpers.CreateAlignedElement("text", comparison: System.StringComparison.OrdinalIgnoreCase);
         
-        Assert.Contains("id=\"", result);
-        Assert.Contains("OrdinalIgnoreCase", result);
+        await Assert.That(result).Contains("id=\"");
+        await Assert.That(result).Contains("OrdinalIgnoreCase");
     }
 
 }

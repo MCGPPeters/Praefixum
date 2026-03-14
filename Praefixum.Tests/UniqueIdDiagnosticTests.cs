@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Praefixum;
-using Xunit;
 
 namespace Praefixum.Tests;
 
@@ -17,8 +16,8 @@ public class UniqueIdDiagnosticTests
 {
     private static readonly CSharpParseOptions ParseOptions = new(LanguageVersion.Preview);
 
-    [Fact]
-    public void PRAEF001_NonStringParameter_EmitsWarning()
+    [Test]
+    public async Task PRAEF001_NonStringParameter_EmitsWarning()
     {
         // Arrange — [UniqueId] on an int parameter
         var source = """
@@ -40,11 +39,11 @@ public class UniqueIdDiagnosticTests
 
         var diagnostics = RunGeneratorAndGetDiagnostics(source);
 
-        Assert.Contains(diagnostics, d => d.Id == "PRAEF001");
+        await Assert.That(diagnostics).Contains(d => d.Id == "PRAEF001");
     }
 
-    [Fact]
-    public void PRAEF002_NonNullableStringParameter_EmitsWarning()
+    [Test]
+    public async Task PRAEF002_NonNullableStringParameter_EmitsWarning()
     {
         // Arrange — [UniqueId] on a non-nullable string parameter
         var source = """
@@ -66,11 +65,11 @@ public class UniqueIdDiagnosticTests
 
         var diagnostics = RunGeneratorAndGetDiagnostics(source);
 
-        Assert.Contains(diagnostics, d => d.Id == "PRAEF002");
+        await Assert.That(diagnostics).Contains(d => d.Id == "PRAEF002");
     }
 
-    [Fact]
-    public void PRAEF003_NoDefaultValue_EmitsInfo()
+    [Test]
+    public async Task PRAEF003_NoDefaultValue_EmitsInfo()
     {
         // Arrange — [UniqueId] on a parameter without default value
         var source = """
@@ -93,11 +92,11 @@ public class UniqueIdDiagnosticTests
 
         var diagnostics = RunGeneratorAndGetDiagnostics(source);
 
-        Assert.Contains(diagnostics, d => d.Id == "PRAEF003");
+        await Assert.That(diagnostics).Contains(d => d.Id == "PRAEF003");
     }
 
-    [Fact]
-    public void CorrectUsage_EmitsNoDiagnostics()
+    [Test]
+    public async Task CorrectUsage_EmitsNoDiagnostics()
     {
         // Arrange — correct usage: nullable string with default null
         var source = """
@@ -121,11 +120,11 @@ public class UniqueIdDiagnosticTests
         var diagnostics = RunGeneratorAndGetDiagnostics(source);
 
         // Should not contain any PRAEF diagnostics
-        Assert.DoesNotContain(diagnostics, d => d.Id.StartsWith("PRAEF"));
+        await Assert.That(diagnostics).DoesNotContain(d => d.Id.StartsWith("PRAEF"));
     }
 
-    [Fact]
-    public void PRAEF001_OnMultipleParameters_EmitsMultipleWarnings()
+    [Test]
+    public async Task PRAEF001_OnMultipleParameters_EmitsMultipleWarnings()
     {
         // Arrange — [UniqueId] on two non-string parameters
         var source = """
@@ -148,7 +147,7 @@ public class UniqueIdDiagnosticTests
         var diagnostics = RunGeneratorAndGetDiagnostics(source);
 
         var praef001s = diagnostics.Where(d => d.Id == "PRAEF001").ToList();
-        Assert.Equal(2, praef001s.Count);
+        await Assert.That(praef001s.Count).IsEqualTo(2);
     }
 
     // ==========================================

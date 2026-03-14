@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Praefixum;
-using Xunit;
 
 namespace Praefixum.Tests;
 
@@ -13,8 +12,8 @@ public class UniqueIdGeneratorTransitiveTests
 {
     private static readonly CSharpParseOptions ParseOptions = new(LanguageVersion.Preview);
 
-    [Fact]
-    public void Generator_DoesNotEmitAttribute_WhenTypesAlreadyReferenced()
+    [Test]
+    public async Task Generator_DoesNotEmitAttribute_WhenTypesAlreadyReferenced()
     {
         var platformReferences = GetTrustedPlatformReferences();
         var upstreamReference = CreateUpstreamUniqueIdReference(platformReferences);
@@ -30,7 +29,7 @@ public class UniqueIdGeneratorTransitiveTests
             .Select(source => source.HintName)
             .ToList();
 
-        Assert.DoesNotContain("UniqueIdAttribute.g.cs", generatedFiles);
+        await Assert.That(generatedFiles).DoesNotContain("UniqueIdAttribute.g.cs");
     }
 
     private static List<MetadataReference> GetTrustedPlatformReferences()

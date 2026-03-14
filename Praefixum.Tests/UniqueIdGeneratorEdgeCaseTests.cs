@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Praefixum.Tests;
 
 /// <summary>
@@ -7,30 +5,30 @@ namespace Praefixum.Tests;
 /// </summary>
 public class UniqueIdGeneratorEdgeCaseTests
 {
-    [Fact]
-    public void GenerateId_WithNullParameter_GeneratesId()
+    [Test]
+    public async Task GenerateId_WithNullParameter_GeneratesId()
     {
         // Arrange & Act
         var result = TestHelpers.CreateHtmlElement("div", null);
         var id = TestHelpers.ExtractId(result);
         
         // Assert
-        Assert.NotNull(id);
-        Assert.True(id.Length > 0);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!.Length > 0).IsTrue();
     }
 
-    [Fact]
-    public void GenerateId_WithExplicitId_ReturnsExplicitId()
+    [Test]
+    public async Task GenerateId_WithExplicitId_ReturnsExplicitId()
     {
         // Arrange & Act
         var result = TestHelpers.CreateHtmlElement("div", "my-explicit-id");
         
         // Assert
-        Assert.Equal("<div id=\"my-explicit-id\"></div>", result);
+        await Assert.That(result).IsEqualTo("<div id=\"my-explicit-id\"></div>");
     }
 
-    [Fact]
-    public void GenerateId_WithEmptyString_GeneratesId()
+    [Test]
+    public async Task GenerateId_WithEmptyString_GeneratesId()
     {
         // Arrange & Act
         var result = TestHelpers.CreateHtmlElement("div", "");
@@ -38,33 +36,33 @@ public class UniqueIdGeneratorEdgeCaseTests
         
         // Assert
         // Empty string should be treated as null and generate an ID
-        Assert.NotNull(id);
-        Assert.True(id.Length > 0);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!.Length > 0).IsTrue();
     }
 
-    [Theory]
-    [InlineData("div")]
-    [InlineData("span")]
-    [InlineData("button")]
-    [InlineData("input")]
-    [InlineData("section")]
-    [InlineData("article")]
-    [InlineData("header")]
-    [InlineData("footer")]
-    public void GenerateId_WithVariousHtmlTags_WorksCorrectly(string tagName)
+    [Test]
+    [Arguments("div")]
+    [Arguments("span")]
+    [Arguments("button")]
+    [Arguments("input")]
+    [Arguments("section")]
+    [Arguments("article")]
+    [Arguments("header")]
+    [Arguments("footer")]
+    public async Task GenerateId_WithVariousHtmlTags_WorksCorrectly(string tagName)
     {
         // Arrange & Act
         var result = TestHelpers.CreateHtmlElement(tagName, null);
         var id = TestHelpers.ExtractId(result);
         
         // Assert
-        Assert.NotNull(id);
-        Assert.True(TestHelpers.IsValidHtmlId(id));
-        Assert.Contains($"<{tagName} id=\"{id}\"></{tagName}>", result);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(TestHelpers.IsValidHtmlId(id!)).IsTrue();
+        await Assert.That(result).Contains($"<{tagName} id=\"{id}\"></{tagName}>");
     }
 
-    [Fact]
-    public void GenerateId_LargeNumberOfCalls_IsDeterministicPerCallSite()
+    [Test]
+    public async Task GenerateId_LargeNumberOfCalls_IsDeterministicPerCallSite()
     {
         // Arrange
         const int largeCount = 1000;
@@ -73,30 +71,30 @@ public class UniqueIdGeneratorEdgeCaseTests
         var ids = TestHelpers.CreateMultipleElements(largeCount);
         
         // Assert
-        Assert.Equal(largeCount, ids.Count);
-        Assert.Single(ids.Distinct());
-        Assert.True(ids.All(id => TestHelpers.IsValidHtmlId(id)));
+        await Assert.That(ids.Count).IsEqualTo(largeCount);
+        await Assert.That(ids.Distinct()).HasSingleItem();
+        await Assert.That(ids.All(id => TestHelpers.IsValidHtmlId(id))).IsTrue();
     }
 
-    [Fact]
-    public void GenerateId_MultipleAttributeUsages_WorksCorrectly()
+    [Test]
+    public async Task GenerateId_MultipleAttributeUsages_WorksCorrectly()
     {
         // Arrange & Act
         var form = TestHelpers.CreateForm();
         var idMatches = System.Text.RegularExpressions.Regex.Matches(form, @"id=""([^""]+)""");
         
         // Assert
-        Assert.True(idMatches.Count >= 3); // Form should have multiple elements
+        await Assert.That(idMatches.Count >= 3).IsTrue(); // Form should have multiple elements
         
         var ids = idMatches.Cast<System.Text.RegularExpressions.Match>()
             .Select(m => m.Groups[1].Value)
             .ToList();
             
-        Assert.Equal(ids.Count, ids.Distinct().Count()); // All should be unique
+        await Assert.That(ids.Count).IsEqualTo(ids.Distinct().Count()); // All should be unique
     }
 
-    [Fact]
-    public void GenerateId_WithSpecialCharacterContent_ProducesSafeIds()
+    [Test]
+    public async Task GenerateId_WithSpecialCharacterContent_ProducesSafeIds()
     {
         // Arrange & Act
         var result1 = TestHelpers.CreatePrefixedDiv(null, "Content with <special> & characters!");
@@ -106,20 +104,20 @@ public class UniqueIdGeneratorEdgeCaseTests
         var id2 = TestHelpers.ExtractId(result2);
         
         // Assert
-        Assert.NotNull(id1);
-        Assert.NotNull(id2);
-        Assert.True(TestHelpers.IsValidHtmlId(id1));
-        Assert.True(TestHelpers.IsValidHtmlId(id2));
+        await Assert.That(id1).IsNotNull();
+        await Assert.That(id2).IsNotNull();
+        await Assert.That(TestHelpers.IsValidHtmlId(id1!)).IsTrue();
+        await Assert.That(TestHelpers.IsValidHtmlId(id2!)).IsTrue();
         
         // IDs should not contain problematic characters
-        Assert.DoesNotContain("<", id1);
-        Assert.DoesNotContain(">", id1);
-        Assert.DoesNotContain("&", id1);
-        Assert.DoesNotContain(" ", id1);
+        await Assert.That(id1!).DoesNotContain("<");
+        await Assert.That(id1).DoesNotContain(">");
+        await Assert.That(id1).DoesNotContain("&");
+        await Assert.That(id1).DoesNotContain(" ");
     }
 
-    [Fact]
-    public void GenerateId_MemoryEfficiency_DoesNotLeakMemory()
+    [Test]
+    public async Task GenerateId_MemoryEfficiency_DoesNotLeakMemory()
     {
         // Arrange
         var initialMemory = GC.GetTotalMemory(true);
@@ -140,10 +138,11 @@ public class UniqueIdGeneratorEdgeCaseTests
         
         // Assert - Memory increase should be reasonable (less than 10MB for 10k elements)
         var memoryIncrease = finalMemory - initialMemory;
-        Assert.True(memoryIncrease < 10 * 1024 * 1024, $"Memory increase: {memoryIncrease / 1024.0 / 1024.0:F2} MB");
+        await Assert.That(memoryIncrease < 10 * 1024 * 1024).IsTrue()
+            .Because($"Memory increase: {memoryIncrease / 1024.0 / 1024.0:F2} MB");
     }
 
-    [Fact]
+    [Test]
     public async Task GenerateId_ThreadSafety_ProducesDeterministicIdsAcrossThreads()
     {
         // Arrange
@@ -175,7 +174,7 @@ public class UniqueIdGeneratorEdgeCaseTests
 
         // Assert
         var expectedCount = threadsCount * idsPerThread;
-        Assert.Equal(expectedCount, allIds.Count);
-        Assert.Single(allIds.Distinct());
+        await Assert.That(allIds.Count).IsEqualTo(expectedCount);
+        await Assert.That(allIds.Distinct()).HasSingleItem();
     }
 }

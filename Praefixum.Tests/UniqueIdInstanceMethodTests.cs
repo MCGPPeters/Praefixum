@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace Praefixum.Tests;
 
 /// <summary>
@@ -73,8 +71,8 @@ public class UniqueIdInstanceMethodTests
     // TESTS
     // ==========================================
 
-    [Fact]
-    public void InstanceMethod_GeneratesUniqueId()
+    [Test]
+    public async Task InstanceMethod_GeneratesUniqueId()
     {
         // Arrange
         var builder = new HtmlBuilder("section");
@@ -84,14 +82,14 @@ public class UniqueIdInstanceMethodTests
 
         // Assert
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.NotEmpty(id);
-        Assert.StartsWith("<section", result);
-        Assert.Contains("Hello", result);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).IsNotEmpty();
+        await Assert.That(result).StartsWith("<section");
+        await Assert.That(result).Contains("Hello");
     }
 
-    [Fact]
-    public void InstanceMethod_DifferentCallSites_ProduceDifferentIds()
+    [Test]
+    public async Task InstanceMethod_DifferentCallSites_ProduceDifferentIds()
     {
         // Arrange
         var builder = new HtmlBuilder("div");
@@ -103,13 +101,13 @@ public class UniqueIdInstanceMethodTests
         // Assert
         var id1 = TestHelpers.ExtractId(result1);
         var id2 = TestHelpers.ExtractId(result2);
-        Assert.NotNull(id1);
-        Assert.NotNull(id2);
-        Assert.NotEqual(id1, id2);
+        await Assert.That(id1).IsNotNull();
+        await Assert.That(id2).IsNotNull();
+        await Assert.That(id1).IsNotEqualTo(id2);
     }
 
-    [Fact]
-    public void InstanceMethod_SameCallSite_ProducesSameId()
+    [Test]
+    public async Task InstanceMethod_SameCallSite_ProducesSameId()
     {
         var builder = new HtmlBuilder("div");
         var ids = new HashSet<string>();
@@ -117,101 +115,101 @@ public class UniqueIdInstanceMethodTests
         {
             var result = builder.CreateElement(content: $"Item {i}");
             var id = TestHelpers.ExtractId(result);
-            Assert.NotNull(id);
-            ids.Add(id);
+            await Assert.That(id).IsNotNull();
+            ids.Add(id!);
         }
 
         // Same call site should produce the same deterministic ID
-        Assert.Single(ids);
+        await Assert.That(ids).HasSingleItem();
     }
 
-    [Fact]
-    public void InstanceMethod_WithExplicitId_UsesProvidedId()
+    [Test]
+    public async Task InstanceMethod_WithExplicitId_UsesProvidedId()
     {
         var builder = new HtmlBuilder("span");
         var result = builder.CreateElement("my-explicit-id", "text");
 
-        Assert.Contains("my-explicit-id", result);
+        await Assert.That(result).Contains("my-explicit-id");
     }
 
-    [Fact]
-    public void InstanceMethod_GuidFormat_Generates32CharId()
+    [Test]
+    public async Task InstanceMethod_GuidFormat_Generates32CharId()
     {
         var builder = new HtmlBuilder("div");
         var result = builder.CreateElementWithGuid();
 
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.Equal(32, id.Length);
-        Assert.True(id.All(c => char.IsLetterOrDigit(c)));
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!.Length).IsEqualTo(32);
+        await Assert.That(id.All(c => char.IsLetterOrDigit(c))).IsTrue();
     }
 
-    [Fact]
-    public void InstanceMethod_WithPrefix_IncludesPrefix()
+    [Test]
+    public async Task InstanceMethod_WithPrefix_IncludesPrefix()
     {
         var builder = new HtmlBuilder("div");
         var result = builder.CreateElementWithPrefix();
 
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.StartsWith("inst-", id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).StartsWith("inst-");
     }
 
-    [Fact]
-    public void InstanceMethod_SequentialFormat_GeneratesNumericId()
+    [Test]
+    public async Task InstanceMethod_SequentialFormat_GeneratesNumericId()
     {
         var builder = new HtmlBuilder("div");
         var result = builder.CreateElementWithSequential();
 
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.True(id.All(char.IsDigit), $"Sequential ID '{id}' should be all digits");
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!.All(char.IsDigit)).IsTrue().Because($"Sequential ID '{id}' should be all digits");
     }
 
-    [Fact]
-    public void InstanceMethod_SemanticFormat_GeneratesReadableId()
+    [Test]
+    public async Task InstanceMethod_SemanticFormat_GeneratesReadableId()
     {
         var builder = new HtmlBuilder("div");
         var result = builder.CreateElementWithSemantic();
 
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.Contains("-", id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).Contains("-");
     }
 
-    [Fact]
-    public void InstanceMethod_NonStringReturnType_WorksCorrectly()
+    [Test]
+    public async Task InstanceMethod_NonStringReturnType_WorksCorrectly()
     {
         var builder = new HtmlBuilder("div");
         var hash = builder.GetIdHash();
 
         // Should have been called with a generated ID, producing a non-zero hash
-        Assert.NotEqual(0, hash);
+        await Assert.That(hash).IsNotEqualTo(0);
     }
 
-    [Fact]
-    public void InstanceMethod_VoidReturnType_WorksCorrectly()
+    [Test]
+    public async Task InstanceMethod_VoidReturnType_WorksCorrectly()
     {
         var builder = new HtmlBuilder("div");
         builder.SetId();
 
-        Assert.NotNull(builder.LastSetId);
-        Assert.NotEmpty(builder.LastSetId);
+        await Assert.That(builder.LastSetId).IsNotNull();
+        await Assert.That(builder.LastSetId!).IsNotEmpty();
     }
 
-    [Fact]
+    [Test]
     public async Task InstanceMethod_AsyncMethod_WorksCorrectly()
     {
         var builder = new HtmlBuilder("div");
         var result = await builder.CreateElementAsync();
 
         var id = TestHelpers.ExtractId(result);
-        Assert.NotNull(id);
-        Assert.NotEmpty(id);
+        await Assert.That(id).IsNotNull();
+        await Assert.That(id!).IsNotEmpty();
     }
 
-    [Fact]
-    public void InstanceMethod_DifferentInstances_DifferentCallSites_ProduceDifferentIds()
+    [Test]
+    public async Task InstanceMethod_DifferentInstances_DifferentCallSites_ProduceDifferentIds()
     {
         // The ID is determined by call site, not by instance
         var builder1 = new HtmlBuilder("div");
@@ -224,8 +222,8 @@ public class UniqueIdInstanceMethodTests
         var id2 = TestHelpers.ExtractId(result2);
 
         // Different call sites (different lines), so IDs should differ
-        Assert.NotNull(id1);
-        Assert.NotNull(id2);
-        Assert.NotEqual(id1, id2);
+        await Assert.That(id1).IsNotNull();
+        await Assert.That(id2).IsNotNull();
+        await Assert.That(id1).IsNotEqualTo(id2);
     }
 }
